@@ -5,11 +5,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- <script src="{{ asset('assets/invoice/js/jquery-1.11.2.min.js') }}"></script>
-                        <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
-                        <script src="js/ajax.js"></script> -->
+                                <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
+                                <script src="js/ajax.js"></script> -->
     <!--
-                        <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
-                        <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
+                                <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
+                                <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
 
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -502,12 +502,12 @@
                 </form>
 
                 <!--  <div class='row'>
-                                  <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
-                                    <div class="well text-center">
-                                  <h2>Back TO Tutorial: <a href="#"> Invoice System </a> </h2>
-                                </div>
-                                  </div>
-                                </div>   -->
+                                          <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+                                            <div class="well text-center">
+                                          <h2>Back TO Tutorial: <a href="#"> Invoice System </a> </h2>
+                                        </div>
+                                          </div>
+                                        </div>   -->
 
 
 
@@ -516,73 +516,73 @@
     </div>
 
     <script>
-            var i = $('table tbody tr').length; // start counter
+        var i = $('table tbody tr').length; // start counter
 
-            // === MAIN CALCULATION LOGIC ===
-            function calculateLine(rowId) {
-                var amount = parseFloat($('#Amount_' + rowId).val()) || 0;
-                var taxRate = parseFloat($('#TaxID_' + rowId).val()) || 0;
-                var TaxType = $('#tax_type').val(); // 'inclusive' or 'exclusive'
+        // === MAIN CALCULATION LOGIC ===
+        function calculateLine(rowId) {
+            var amount = parseFloat($('#Amount_' + rowId).val()) || 0;
+            var taxRate = parseFloat($('#TaxID_' + rowId).val()) || 0;
+            var TaxType = $('#tax_type').val(); // 'inclusive' or 'exclusive'
 
-                var taxAmount, lineTotal;
+            var taxAmount, lineTotal;
 
-                if (TaxType === 'inclusive') {
-                    // Amount entered is inclusive of tax → calculate tax portion & exclusive total
-                    lineTotal = amount / (1 + taxRate / 100); // exclusive amount
-                    taxAmount = amount - lineTotal; // tax = inclusive - exclusive
-                } else {
-                    // Exclusive: Amount is without tax
-                    taxAmount = amount * (taxRate / 100);
-                    lineTotal = amount + taxAmount;
+            if (TaxType === 'inclusive') {
+                // Amount entered is inclusive of tax → calculate tax portion & exclusive total
+                lineTotal = amount / (1 + taxRate / 100); // exclusive amount
+                taxAmount = amount - lineTotal; // tax = inclusive - exclusive
+            } else {
+                // Exclusive: Amount is without tax
+                taxAmount = amount * (taxRate / 100);
+                lineTotal = amount + taxAmount;
+            }
+
+            $('#TaxVal_' + rowId).val(taxAmount.toFixed(2));
+            $('#ItemTotal_' + rowId).val(lineTotal.toFixed(2));
+        }
+
+        function calculateAllLines() {
+            $('table tbody tr').each(function() {
+                var rowId = $(this).find('.amount-input').attr('id');
+                if (rowId) {
+                    rowId = rowId.split('_')[1];
+                    calculateLine(rowId);
                 }
+            });
+            updateGrandTotals();
+        }
 
-                $('#TaxVal_' + rowId).val(taxAmount.toFixed(2));
-                $('#ItemTotal_' + rowId).val(lineTotal.toFixed(2));
-            }
+        function updateGrandTotals() {
+            var totalTax = 0;
+            var grandTotal = 0;
 
-            function calculateAllLines() {
-                $('table tbody tr').each(function() {
-                    var rowId = $(this).find('.amount-input').attr('id');
-                    if (rowId) {
-                        rowId = rowId.split('_')[1];
-                        calculateLine(rowId);
-                    }
-                });
-                updateGrandTotals();
-            }
-
-            function updateGrandTotals() {
-                var totalTax = 0;
-                var grandTotal = 0;
-
-                $('.totalLinePrice2').each(function() { // TaxVal fields
-                    totalTax += parseFloat($(this).val()) || 0;
-                });
-                $('.totalLinePrice').each(function() { // ItemTotal fields
-                    grandTotal += parseFloat($(this).val()) || 0;
-                });
-
-                $('#grandtotaltax').val(totalTax.toFixed(2));
-                $('#grandtotal').val(grandTotal.toFixed(2));
-            }
-
-            // === EVENT BINDINGS ===
-            // When Expense Type changes → recalculate everything
-            $(document).on('change', '#tax_type', function() {
-                calculateAllLines();
+            $('.totalLinePrice2').each(function() { // TaxVal fields
+                totalTax += parseFloat($(this).val()) || 0;
+            });
+            $('.totalLinePrice').each(function() { // ItemTotal fields
+                grandTotal += parseFloat($(this).val()) || 0;
             });
 
-            // When Amount or Tax % changes in any row
-            $(document).on('keyup change', '.amount-input, .tax-cal', function() {
-                var rowId = $(this).attr('id').split('_')[1];
-                calculateLine(rowId);
-                updateGrandTotals();
-            });
+            $('#grandtotaltax').val(totalTax.toFixed(2));
+            $('#grandtotal').val(grandTotal.toFixed(2));
+        }
 
-            // Add More Button – fixed & clean
-            $(".addmore").on('click', function() {
-                i++;
-                var html = `
+        // === EVENT BINDINGS ===
+        // When Expense Type changes → recalculate everything
+        $(document).on('change', '#tax_type', function() {
+            calculateAllLines();
+        });
+
+        // When Amount or Tax % changes in any row
+        $(document).on('keyup change', '.amount-input, .tax-cal', function() {
+            var rowId = $(this).attr('id').split('_')[1];
+            calculateLine(rowId);
+            updateGrandTotals();
+        });
+
+        // Add More Button – fixed & clean
+        $(".addmore").on('click', function() {
+            i++;
+            var html = `
             <tr>
                 <td class="text-center"><input class="case" type="checkbox"></td>
                 <td>
@@ -608,561 +608,26 @@
                 <td><input type="number" name="TaxVal[]" id="TaxVal_${i}" class="form-control totalLinePrice2" step="0.01"></td>
                 <td><input type="number" name="ItemTotal[]" id="ItemTotal_${i}" class="form-control totalLinePrice" step="0.01"></td>
             </tr>`;
-                $('table tbody').append(html);
-                $('#ItemID0_' + i).select2();
-            });
-
-            // Delete rows
-            $(".delete").on('click', function() {
-                $('.case:checked').parents('tr').remove();
-                calculateAllLines();
-            });
-
-            // Optional: km function (if you still use it for something)
-            function km(v, id) {
-                $('#ItemID_' + id).val(v);
-            }
-
-            // Initialize on page load
-            $(document).ready(function() {
-                calculateAllLines();
-            });
-    </script>
-
-
-   {{-- <script>
-        $('input[name=tax_action]').change(function(e) {
-            $('.exclusive_cal').val(e.target.value)
-        })
-
-
-        /**
-         * Site : http:www.smarttutorials.net
-         * @author muni
-         */
-
-        var i = $('table tr').length;
-        $(".addmore").on('click', function() {
-            html = '<tr class="  border-1 border-light">';
-            html += '<td class="p-1 text-center"><input class="case" type="checkbox"/></td>';
-            html += '<td><select name="ItemID0[]" id="ItemID0_' + i +
-                '"  style="width: 300px !important;" class="form-select select2 changesNoo" onchange="km(this.value,' +
-                i +
-                ');" > <option value="">select</option>}@foreach ($items as $key => $value) <option value="{{ $value->ChartOfAccountID }}|{{ $value->ChartOfAccountName }}">{{ $value->ChartOfAccountName }}</option>@endforeach</select><input type="hidden" name="ChartOfAccountID[]" id="ItemID_' +
-                i + '"></td>';
-
-
-
-            html += '  <td><input type="text" name="Description[]" id="Description_' + i +
-                '" class=" form-control " ></td>';
-            html += '<td class="d-none";><input type="text" name="Qty[]" id="Qty_' + i +
-                '" class="form-control changesNo" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="1"></td>';
-
-            html += '<td class="d-none"><input type="text" name="Price[]" id="Price_' + i +
-                '" class="form-control changesNo " autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="1"></td>';
-
-            html += '<td><select name="Tax[]" id="TaxID_' + i +
-                '" class="form-select changesNo exclusive_cal"><?php foreach ($tax as $key => $valueX1) : ?><option value="{{ $valueX1->TaxPer }}">{{ $valueX1->Description }}</option><?php endforeach ?></select></td>';
-
-
-            html += '<td><input type="number" name="TaxVal[]" id="TaxVal_' + i +
-                '" class=" form-control totalLinePrice2 tax "autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" step="0.01"></td>';
-
-
-
-
-            html += '<td><input type="text" name="ItemTotal[]" id="ItemTotal_' + i +
-                '" class="form-control totalLinePrice" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;"></td>';
-
-            html += '</tr>';
-            $('table').append(html);
-            $('.select2', 'table').select2();
-            i++;
-
-
-
-            // var data=<?php //echo $item;
-            ?>
-            // // var data=JSON.parse({{ $item }});
-
-            // let country = data.find(value => value.ItemCode === "AP");
-            // // => {name: "Albania", code: "AL"}
-            // console.log(country);
-            // console.log(country["ItemCode"]);
-
+            $('table tbody').append(html);
+            $('#ItemID0_' + i).select2();
         });
 
-
-
-
-
-        //to check all checkboxes
-        $(document).on('change', '#check_all', function() {
-            $('input[class=case]:checkbox').prop("checked", $(this).is(':checked'));
-        });
-
-        //deletes the selected table rows
-
-        // var data=JSON.parse({{ $item }});
-
-        // let country = data.find(value => value.ItemCode === "AP");
-        // // => {name: "Albania", code: "AL"}
-        // console.log(country);
-        // console.log(country["ItemCode"]);
-
-        //org
-        //$(document).on('  keyup blur select','.changesNoo',function(){
-
-
-        function km(v, id) {
-
-
-
-            // alert(v+id);
-
-            id_arr = 'ItemID0_' + id;
-            id = id_arr.split("_");
-
-            val = $('#ItemID0_' + id[1]).val().split("|");
-
-
-            // alert($('#ItemID0_'+id[1]).val());
-            $('#ItemID_' + id[1]).val(val[0]);
-
-
-
-            // alert('val done');
-
-
-
-
-
-
-            calculateTotal();
-
-            if (isNaN($('#discountAmount').val())) {
-                $('#discountAmount').val(0);
-            }
-
-            calculatediscount();
-            calculateTotal();
-
-
-
-        }
-
-
-
-
-
-
-
-
-
-        $(document).on(' keyup blur select', '.changesNoo123', function() {
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-
-            var data = <?php echo $item; ?>;
-
-            var data = <?php echo $item; ?> // this is dynamic data in json_encode(); from controller
-
-            var item_idd = $('#ItemID_' + id[1]).val();
-
-            var index = -1;
-            var val = parseInt(item_idd);
-            var json = data.find(function(item, i) {
-                if (item.ItemID === val) {
-                    index = i + 1;
-                    return i + 1;
-                }
-            });
-
-            $('#Qty_' + id[1]).val(1);
-            $('#Price_' + id[1]).val(json["SellingPrice"]);
-
-
-
-            $('#ItemTotal_' + id[1]).val((parseFloat(json["SellingPrice"]) * parseFloat($('#Qty_' + id[1]).val()))
-                .toFixed(2));
-
-
-
-            calculateTotal();
-
-            if (isNaN($('#discountAmount').val())) {
-                $('#discountAmount').val(0);
-            }
-
-            calculatediscount();
-            calculateTotal();
-
-
-
-        });
-
-
-
-        //deletes the selected table rows
+        // Delete rows
         $(".delete").on('click', function() {
-            $('.case:checkbox:checked').parents("tr").remove();
-            $('#check_all').prop("checked", false);
-            calculateTotal();
+            $('.case:checked').parents('tr').remove();
+            calculateAllLines();
         });
 
-
-
-
-
-
-
-        //price change
-        $(document).on('change keyup blur ', '.changesNo', function() {
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-            Qty = $('#Qty_' + id[1]).val();
-
-            TaxPer = $('#TaxID_' + id[1]).val();
-
-            Price = $('#Price_' + id[1]).val();
-
-            TotalPrice = parseFloat(Qty) * parseFloat(Price);
-
-            TotalTaxPer = (parseFloat(TaxPer) / 100) * parseFloat(TotalPrice);
-
-
-
-
-
-
-
-            ItemTotal = parseFloat(TotalPrice) + parseFloat(TotalTaxPer);
-
-
-
-            // $('#ItemTotal_' + id[1]).val(ItemTotal);
-            // $('#TaxVal_' + id[1]).val(parseFloat(TotalTaxPer));
-
-
-
-            //
-            // console.log('new line');
-            // console.log('qty=');
-
-            // console.log(Qty);
-
-            // console.log('price');
-
-
-            // console.log(Price);
-
-
-            // console.log('---');
-
-
-
-            // console.log('----total price');
-            // console.log(TotalPrice);
-
-            // console.log('taxper');
-
-
-            // console.log(TaxPer);
-
-            // console.log('--taxamount-');
-            // console.log(TaxAmount);
-            // console.log('discount');
-            // console.log(discount);
-            // console.log('total price');
-            // console.log(TotalPrice);
-
-            // console.log('grand item total');
-            // console.log(ItemTotal);
-
-
-
-
-
-
-
-
-
-
-
-
-            // $('#ItemTotal_'+id[1]).val(  (parseFloat(json["SellingPrice"])*parseFloat( $('#Qty_'+id[1]).val() ) + parseFloat($('#TaxAmount_'+id[1]).val() )  - (parseFloat($('#discount_'+id[1]).val()) )    ).toFixed(2)   );
-
-
-
-
-
-            calculatediscount();
-            calculateTotal();
-        });
-
-        //////////
-
-        $(document).on(' blur', '.totalLinePrice', function() {
-
-
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-
-
-            total = $('#ItemTotal_' + id[1]).val();
-
-            taxper = $('#TaxID_' + id[1]).val();
-
-
-            tax = (total * taxper) / 100;
-
-            $('#TaxVal_' + id[1]).val(tax);
-
-
-
-            taxtotal = 0;
-            $('.tax').each(function() {
-                if ($(this).val() != '') taxtotal += parseFloat($(this).val());
-            });
-
-
-
-
-            $('#grandtotaltax').val(taxtotal);
-
-            gtotal = 0;
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') gtotal += parseFloat($(this).val());
-            });
-
-
-            $('#grandtotal').val(gtotal);
-            calculateTotal();
-            // Profit = (parseFloat(total)-parseFloat(Fare)).toFixed(2) ;
-
-            // Tax = ;
-
-            // Service = (parseFloat(Proft)-parseFloat(Tax)).toFixed(2) ;
-
-            // alert(Profit+Tax+Service);
-
-            // $('#quantity'+id[1]).val( Tax );
-            // $('#Service_'+id[1]).val( Service );
-
-
-
-        });
-
-        $(document).on('change', '.changesNoo', function() {
-
-
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-            val = $('#ItemID0_' + id[1]).val().split("|");
-
-
-            // alert($('#ItemID0_'+id[1]).val());
-            $('#ItemID_' + id[1]).val(val[0]);
-
-
-            calculatediscount();
-
-        });
-
-        ////////////////////////////////////////////
-
-        function calculatediscount() {
-            subTotal = 0;
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') subTotal += parseFloat($(this).val());
-            });
-            subTotal = parseFloat($('#subTotal').val());
-
-
-            discountper = $('#discountper').val();
-            // totalafterdisc = $('#totalAftertax').val();
-            // console.log('testing'.totalAftertax);
-            if (discountper != '' && typeof(discountper) != "undefined") {
-                discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
-
-                $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
-                total = subTotal - discountamount;
-                $('#totalafterdisc').val(total.toFixed(2));
-                // $('#grandtotal').val(total.toFixed(2));
-
-            } else {
-                $('#discountper').val(0);
-                // alert('dd');
-                $('#DiscountAmount').val(0);
-                total = subTotal;
-                $('#totalafterdisc').val(total.toFixed(2));
-
-            }
-
+        // Optional: km function (if you still use it for something)
+        function km(v, id) {
+            $('#ItemID_' + id).val(v);
         }
 
-
-        $(document).on('blur', '#discountAmount', function() {
-
-
-            calculatediscountper();
-
+        // Initialize on page load
+        $(document).ready(function() {
+            calculateAllLines();
         });
-
-        function calculatediscountper() {
-            subTotal = 0;
-
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') subTotal += parseFloat($(this).val());
-            });
-            subTotal = parseFloat($('#subTotal').val());
-
-
-            discountAmount = $('#discountAmount').val();
-            // totalafterdisc = $('#totalAftertax').val();
-            // console.log('testing'.totalAftertax);
-            if (discountAmount != '' && typeof(discountAmount) != "undefined") {
-                discountper = (parseFloat(discountAmount) / parseFloat(subTotal)) * 100;
-
-                $('#discountper').val(parseFloat(discountper.toFixed(2)));
-                total = subTotal - discountAmount;
-                $('#totalafterdisc').val(total.toFixed(2));
-                // $('#grandtotal').val(total.toFixed(2));
-
-            } else {
-                $('#discountper').val(0);
-                // alert('dd');
-                $('#discountper').val(0);
-                total = subTotal;
-                $('#totalafterdisc').val(total.toFixed(2));
-
-            }
-
-        }
-
-        //////////////////
-
-        // discount percentage
-        $(document).on('change keyup blur onmouseover onclick', '#discountper', function() {
-            calculatediscount();
-
-
-            calculateTotal();
-
-        });
-        $(document).on('change keyup blur   onclick', '#taxpercentage', function() {
-            calculateTotal();
-        });
-
-
-        $(document).on('change keyup blur   onclick', '#shipping', function() {
-            calculateTotal();
-        });
-
-
-
-        //total price calculation
-        function calculateTotal() {
-
-            // grand_tax = 0;
-            grand_tax = 0;
-            subTotal = 0;
-            total = 0;
-            total2 = 0;
-            sumtax = 0;
-            gt = 0;
-            grandtotaltax = 0;
-            var pretotal = 0;
-
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') subTotal += parseFloat($(this).val());
-            });
-            $('.totalLinePrice2').each(function() {
-                if ($(this).val() != '') grandtotaltax += parseFloat($(this).val());
-            });
-
-            $('#grandtotaltax').val(grandtotaltax.toFixed(2));
-            console.log(grandtotaltax);
-            discountper = $('#discountper').val();
-
-            if (discountper != '' && typeof(discountper) != "undefined") {
-
-            }
-
-            $('#subTotal').val(subTotal.toFixed(2));
-            pretotal = $('#totalafterdisc').val();
-            discountAmount = $('#discountAmount').val();
-            tax = $('#tax').val();
-            grand_tax = $('#taxpercentage').val();
-
-            if (grand_tax != '' && typeof(grand_tax) != "undefined") {
-                gt = subTotal * (parseFloat(grand_tax) / 100);
-
-                $('#taxpercentageAmount').val(gt.toFixed(2));
-                total2 = subTotal + gt - discountAmount;
-            } else {
-                $('#taxpercentage').val(0);
-                total2 = subTotal - pretotal;
-            }
-
-
-            shipping = parseFloat($('#shipping').val());
-
-            shipping_grand = shipping + total2;
-            $('#grandtotal').val(shipping_grand.toFixed(2));
-
-        }
-
-        $(document).on('change keyup blur', '#amountPaid', function() {
-            calculateAmountDue();
-        });
-
-        //due amount calculation
-        function calculateAmountDue() {
-            amountPaid = $('#amountPaid').val();
-            total = $('#grandtotal').val();
-            if (amountPaid != '' && typeof(amountPaid) != "undefined") {
-                amountDue = parseFloat(total) - parseFloat(amountPaid);
-                $('.amountDue').val(amountDue.toFixed(2));
-            } else {
-                total = parseFloat(total).toFixed(2);
-                $('.amountDue').val(total);
-            }
-        }
-
-
-        //It restrict the non-numbers
-        var specialKeys = new Array();
-        specialKeys.push(8, 46); //Backspace
-        function IsNumeric(e) {
-            var keyCode = e.which ? e.which : e.keyCode;
-            // console.log(keyCode);
-            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
-            return ret;
-        }
-
-        //datepicker
-        $(function() {
-            $.fn.datepicker.defaults.format = "dd-mm-yyyy";
-            $('#invoiceDate').datepicker({
-                startDate: '-3d',
-                autoclose: true,
-                clearBtn: true,
-                todayHighlight: true
-            });
-        });
-    </script> --}}
-
-    <!-- <script src="{{ asset('assets/js/jquery-3.6.0.js') }}" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-        crossorigin="anonymous"></script> -->
+    </script>
 
     <script type="text/javascript">
         //<![CDATA[
@@ -1212,6 +677,7 @@
 
         //]]>
     </script>
+
     <!-- ajax trigger -->
     <script>
         function ajax_balance(SupplierID) {
@@ -1220,8 +686,7 @@
 
             $('#result').prepend('')
             $('#result').prepend(
-                '<img id="theImg" src="{{ asset('
-                                                                                                        assets / images / ajax.gif ') }}" />'
+                '<img id="theImg" src="{{ asset('assets / images / ajax.gif ') }}" />'
             )
 
             var SupplierID = SupplierID;
@@ -1252,16 +717,8 @@
             } else {
                 alert('Please Select Branch');
             }
-
-
-
-
         }
     </script>
-
-
-
-
 
     <script>
         $("#InvoiceType").change(function() {
