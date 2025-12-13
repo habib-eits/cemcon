@@ -3260,7 +3260,8 @@ class Accounts extends Controller
 
         session::put('menu', 'SupplierBalance');
         $pagetitle = 'SupplierBalance';
-        return view('supplier_balance', compact('pagetitle'));
+        $supplier = DB::table('supplier')->get();
+        return view('supplier_balance', compact('pagetitle','supplier'));
     }
     public  function SupplierBalance1(request $request)
     {
@@ -3270,8 +3271,13 @@ class Accounts extends Controller
         ////////////////////////////END SCRIPT ////////////////////////////////////////////////
         session::put('menu', 'SupplierBalance');
         $pagetitle = 'Supplier Balance';
-        $supplier = DB::table('supplier')->get();
 
+        if($request->SupplierID){
+            $supplier = DB::table('supplier')->where('SupplierID', $request->SupplierID)->get();
+        }else{
+            $supplier = DB::table('supplier')->get();
+        }
+        
         return view('supplier_balance1', compact('supplier', 'pagetitle'));
     }
     public  function SupplierBalance1PDF(request $request)
@@ -3457,8 +3463,13 @@ class Accounts extends Controller
         ////////////////////////////END SCRIPT ////////////////////////////////////////////////
         $pagetitle = 'Party Balance';
 
+        if($request->PartyID){
+            $party = DB::table('party')->where('PartyID', $request->PartyID)->get();
+        } else {
+            $party = DB::table('party')->get();
+        }
 
-        $party = DB::table('party')->get();
+        // $party = DB::table('party')->get();
 
 
         return  View('party_balance1', compact('party', 'pagetitle'));
@@ -9377,6 +9388,7 @@ $vhno = DB::table('expense_master')
             'ReferenceNo' => $request->ReferenceNo,
             'Tax' => $request->grandtotaltax,
             'GrantTotal' => $request->Grandtotal,
+            'TaxType' => $request->TaxType,
             'Paid' => $request->amountPaid,
         );
         // dd($challan_mst);
@@ -9413,10 +9425,11 @@ $vhno = DB::table('expense_master')
                 'ExpenseMasterID' =>  $ExpenseMasterID,
                 'ChartOfAccountID' => $request->ChartOfAccountID[$i],
                 'Notes' => $request->Description[$i],
+                'Amount' => $request->Amount[$i],
                 'TaxPer' => $request->Tax[$i],
                 'Tax' => $request->TaxVal[$i],
                 'JobID' => $request->JobID,
-                'Amount' => $request->ItemTotal[$i],
+                'Total' => $request->ItemTotal[$i],
 
             );
 
@@ -9603,13 +9616,11 @@ $vhno = DB::table('expense_master')
 
         $expense_master = DB::table('expense_master')->where('ExpenseMasterID', $id)->get();
 
-
+        // dd($expense_master);
         session::put('VHNO', $expense_master[0]->ExpenseNo);
 
 
         $expense_detail = DB::table('expense_detail')->where('ExpenseMasterID', $id)->get();
-
-
 
         return view('expense.expense_edit', compact('tax', 'supplier', 'pagetitle', 'expense_master', 'chartofaccount', 'expense_detail','job'));
     }
@@ -10264,11 +10275,16 @@ $vhno = DB::table('expense_master')
         return $query->where('JobID', $JobID);
     })
     ->orderBy('Date')
-    ->groupby('ChartOfAccountName')
+    ->groupby('ChartOfAccountName','Date')
     ->get();
 
+     $job = DB::table('job')
+        ->leftJoin('party', 'party.PartyID', '=', 'job.PartyID')
+        ->select('job.*', 'party.PartyName')
+        ->where('job.JobID',$request->JobID)
+        ->get();
  
-        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary'));
+        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary','job'));
         //return $pdf->download('pdfview.pdf');
         // $pdf->setpaper('A4', 'portiate');
     }

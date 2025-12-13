@@ -100,7 +100,7 @@
                                             	
                                                 <td> {{$key+1}} </td>
                                                 <td> {{$value->EmployeeID}} </td>
-                                                <td> {{$value->EmployeeName}} </td>
+                                                <td> {{$value->EmployeeName}} | {{$value->BranchName}} </td>
                                                  <td> {{$value->JobTitle}} </td>
                                                   <td> {{$value->DaysPresent}} </td>
                                                 

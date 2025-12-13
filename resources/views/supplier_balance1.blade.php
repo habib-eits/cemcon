@@ -56,9 +56,9 @@
   <div class="card">
       <div class="card-body">
              <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
+  {{-- <tr>
     <td colspan="2"><div align="center"><span class="style2">FALAK TAVEL AND TOURISM LLC </span></div></td>
-  </tr>
+  </tr> --}}
   <tr>
     <td colspan="2"><div align="center" class="style1">VENDOR BALANCE </div></td>
   </tr>

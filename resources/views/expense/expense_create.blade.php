@@ -5,11 +5,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- <script src="{{ asset('assets/invoice/js/jquery-1.11.2.min.js') }}"></script>
-            <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
-            <script src="js/ajax.js"></script> -->
+                        <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
+                        <script src="js/ajax.js"></script> -->
     <!--
-            <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
-            <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
+                        <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
+                        <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
 
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -118,6 +118,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- Expense Type Dropdown -->
+                                    <div class="col-12">
+                                        <div class="mb-1 row">
+                                            <div class="col-sm-3">
+                                                <label class="col-form-label text-danger">Tax Type</label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select name="TaxType" id="tax_type" class="form-select">
+                                                    <option value="exclusive" selected>Exclusive</option>
+                                                    <option value="inclusive">Inclusive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="mb-1 row d-none">
                                         <div class="col-sm-3">
                                             <label class="col-form-label" for="password">Tax</label><i
@@ -212,12 +226,12 @@
                                                 <th width="1%">EXPENSE ACCOUNT </th>
                                                 <th width="10%">NOTES </th>
 
-
+                                                <th width="15%">AMOUNT</th>
                                                 <th width="4%" class="d-none">RATE</th>
                                                 <th width="4%">Tax</th>
                                                 <th width="4%">Tax Val</th>
 
-                                                <th width="4%">AMOUNT</th>
+                                                <th width="4%">Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -244,6 +258,12 @@
                                                 <td>
                                                     <input type="text" name="Description[]" id="Description_1"
                                                         class=" form-control ">
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="Amount[]" id="Amount_1"
+                                                        class="form-control changesNo amount-input" step="0.01"
+                                                        autocomplete="off" onkeypress="return IsNumeric(event);"
+                                                        ondrop="return false;" onpaste="return false;" value="0">
                                                 </td>
                                                 <td class="d-none">
                                                     <input type="number" name="Qty[]" id="Qty_1"
@@ -482,12 +502,12 @@
                 </form>
 
                 <!--  <div class='row'>
-                      <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
-                        <div class="well text-center">
-                      <h2>Back TO Tutorial: <a href="#"> Invoice System </a> </h2>
-                    </div>
-                      </div>
-                    </div>   -->
+                                  <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+                                    <div class="well text-center">
+                                  <h2>Back TO Tutorial: <a href="#"> Invoice System </a> </h2>
+                                </div>
+                                  </div>
+                                </div>   -->
 
 
 
@@ -495,10 +515,122 @@
         </div>
     </div>
 
-
-
-
     <script>
+            var i = $('table tbody tr').length; // start counter
+
+            // === MAIN CALCULATION LOGIC ===
+            function calculateLine(rowId) {
+                var amount = parseFloat($('#Amount_' + rowId).val()) || 0;
+                var taxRate = parseFloat($('#TaxID_' + rowId).val()) || 0;
+                var TaxType = $('#tax_type').val(); // 'inclusive' or 'exclusive'
+
+                var taxAmount, lineTotal;
+
+                if (TaxType === 'inclusive') {
+                    // Amount entered is inclusive of tax → calculate tax portion & exclusive total
+                    lineTotal = amount / (1 + taxRate / 100); // exclusive amount
+                    taxAmount = amount - lineTotal; // tax = inclusive - exclusive
+                } else {
+                    // Exclusive: Amount is without tax
+                    taxAmount = amount * (taxRate / 100);
+                    lineTotal = amount + taxAmount;
+                }
+
+                $('#TaxVal_' + rowId).val(taxAmount.toFixed(2));
+                $('#ItemTotal_' + rowId).val(lineTotal.toFixed(2));
+            }
+
+            function calculateAllLines() {
+                $('table tbody tr').each(function() {
+                    var rowId = $(this).find('.amount-input').attr('id');
+                    if (rowId) {
+                        rowId = rowId.split('_')[1];
+                        calculateLine(rowId);
+                    }
+                });
+                updateGrandTotals();
+            }
+
+            function updateGrandTotals() {
+                var totalTax = 0;
+                var grandTotal = 0;
+
+                $('.totalLinePrice2').each(function() { // TaxVal fields
+                    totalTax += parseFloat($(this).val()) || 0;
+                });
+                $('.totalLinePrice').each(function() { // ItemTotal fields
+                    grandTotal += parseFloat($(this).val()) || 0;
+                });
+
+                $('#grandtotaltax').val(totalTax.toFixed(2));
+                $('#grandtotal').val(grandTotal.toFixed(2));
+            }
+
+            // === EVENT BINDINGS ===
+            // When Expense Type changes → recalculate everything
+            $(document).on('change', '#tax_type', function() {
+                calculateAllLines();
+            });
+
+            // When Amount or Tax % changes in any row
+            $(document).on('keyup change', '.amount-input, .tax-cal', function() {
+                var rowId = $(this).attr('id').split('_')[1];
+                calculateLine(rowId);
+                updateGrandTotals();
+            });
+
+            // Add More Button – fixed & clean
+            $(".addmore").on('click', function() {
+                i++;
+                var html = `
+            <tr>
+                <td class="text-center"><input class="case" type="checkbox"></td>
+                <td>
+                    <select name="ItemID0[]" id="ItemID0_${i}" class="form-select select2 changesNoo" style="width: 300px !important;" onchange="km(this.value,${i});">
+                        <option value="">select</option>
+                        @foreach ($items as $value)
+                            <option value="{{ $value->ChartOfAccountID }}">{{ $value->ChartOfAccountID }}-{{ $value->ChartOfAccountName }}</option>
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="ChartOfAccountID[]" id="ItemID_${i}">
+                </td>
+                <td><input type="text" name="Description[]" id="Description_${i}" class="form-control"></td>
+                <td><input type="number" name="Amount[]" id="Amount_${i}" class="form-control amount-input" step="0.01" value="0"></td>
+                <td class="d-none"><input type="number" name="Qty[]" id="Qty_${i}" value="1"></td>
+                <td class="d-none"><input type="number" name="Price[]" id="Price_${i}" value="0"></td>
+                <td>
+                    <select name="Tax[]" id="TaxID_${i}" class="form-select tax-cal">
+                        <?php foreach ($tax as $valueX1): ?>
+                            <option value="{{ $valueX1->TaxPer }}">{{ $valueX1->Description }}</option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+                <td><input type="number" name="TaxVal[]" id="TaxVal_${i}" class="form-control totalLinePrice2" step="0.01"></td>
+                <td><input type="number" name="ItemTotal[]" id="ItemTotal_${i}" class="form-control totalLinePrice" step="0.01"></td>
+            </tr>`;
+                $('table tbody').append(html);
+                $('#ItemID0_' + i).select2();
+            });
+
+            // Delete rows
+            $(".delete").on('click', function() {
+                $('.case:checked').parents('tr').remove();
+                calculateAllLines();
+            });
+
+            // Optional: km function (if you still use it for something)
+            function km(v, id) {
+                $('#ItemID_' + id).val(v);
+            }
+
+            // Initialize on page load
+            $(document).ready(function() {
+                calculateAllLines();
+            });
+    </script>
+
+
+   {{-- <script>
         $('input[name=tax_action]').change(function(e) {
             $('.exclusive_cal').val(e.target.value)
         })
@@ -1027,7 +1159,7 @@
                 todayHighlight: true
             });
         });
-    </script>
+    </script> --}}
 
     <!-- <script src="{{ asset('assets/js/jquery-3.6.0.js') }}" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
         crossorigin="anonymous"></script> -->
@@ -1089,8 +1221,8 @@
             $('#result').prepend('')
             $('#result').prepend(
                 '<img id="theImg" src="{{ asset('
-                                                        assets / images / ajax.gif ') }}" />'
-                )
+                                                                                                        assets / images / ajax.gif ') }}" />'
+            )
 
             var SupplierID = SupplierID;
 
