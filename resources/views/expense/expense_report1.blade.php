@@ -47,7 +47,27 @@
  
             @endif
 
-            
+            <div class="card mt-2">
+                <div class="card-body">
+                    <h4>Job Details</h4>
+
+                    @if($job)
+                    <table class="table table-sm">
+                        <tr>
+                            <th class="col-md-2">Job No</th>
+                            <td class="col-md-4">{{ $job->JobNo }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Created For</th>
+                            <td>{{ $job->PartyName }}</td>
+                        </tr>
+                    </table>
+                    @else
+                        <p class="text-danger">Job information not found.</p>
+                    @endif
+                </div>
+            </div>
             
   <div class="card">
       <div class="card-body">
@@ -119,23 +139,26 @@ $Tax = $Tax + $value->Tax;
           <table class="table table-sm align-middle table-nowrap mb-0">
   <tbody><tr>
   <th scope="col">S.No</th>
+  {{-- <th scope="col">Job Details</th> --}}
    <th scope="col">Account</th>
   <th scope="col">Tax</th>
   <th scope="col">Amount</th>
   </tr>
   </tbody>
   <tbody>
-  @foreach ($summary as $key =>$value)
+  @foreach ($summary as $key => $value)
+<tr>
+    <td class="col-md-1">{{ $key + 1 }}</td>
 
+    {{-- Show Job Detail + Job No
+    <td class="col-md-2">{{ $value->JobNo  }} </td> --}}
+
+    <td class="col-md-3">{{ $value->ChartOfAccountName }}</td>
+    <td class="col-md-2">{{ $value->Tax }}</td>
+    <td class="col-md-2">{{ $value->TotalAmount }}</td>
+</tr>
+@endforeach
  
-
-   <tr>
-   <td class="col-md-4">{{$key+1}}</td>
-    <td class="col-md-1">{{$value->ChartOfAccountName}}</td>
-   <td class="col-md-1">{{$value->Tax}}</td>
-   <td class="col-md-1">{{$value->TotalAmount}}</td>
-   </tr>
-   @endforeach   
 
  
    </tbody>

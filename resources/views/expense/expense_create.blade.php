@@ -5,11 +5,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- <script src="{{ asset('assets/invoice/js/jquery-1.11.2.min.js') }}"></script>
-            <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
-            <script src="js/ajax.js"></script> -->
-    <!--
-            <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
-            <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
+                <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
+                <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
+                <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
 
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -34,11 +32,7 @@
 
                 <!-- enctype="multipart/form-data" -->
                 <form action="{{ URL('/ExpenseSave') }}" method="post" class="custom-validation">
-
-
                     <input type="hidden" name="_token" id="csrf" value="{{ Session::token() }}">
-
-
                     <div class="card shadow-sm">
                         <div class="card-body">
 
@@ -102,6 +96,21 @@
                                                         {{ $value->ChartOfAccountID }}-{{ $value->ChartOfAccountName }}
                                                     </option>
                                                 @endforeach
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="mb-1 row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label" for="password">Tax type</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select name="TaxType" id="TaxType"
+                                                class="form-select form-control-sm select2   "
+                                                style="width: 100% !important;" required="">
+                                                <option value="">select</option>
+                                                <option value="Inclusive">Inclusive</option>
+                                                <option value="Exclusive">Exclusive</option>
                                             </select>
 
                                         </div>
@@ -194,9 +203,6 @@
                                 </div>
                             </div>
 
-
-
-
                             <hr class="invoice-spacing">
 
                             <div class='text-center'>
@@ -211,13 +217,12 @@
                                                         type="checkbox" /></th>
                                                 <th width="1%">EXPENSE ACCOUNT </th>
                                                 <th width="10%">NOTES </th>
-
-
+                                                <th width="4%">Amount </th>
                                                 <th width="4%" class="d-none">RATE</th>
                                                 <th width="4%">Tax</th>
                                                 <th width="4%">Tax Val</th>
 
-                                                <th width="4%">AMOUNT</th>
+                                                <th width="4%">Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -245,8 +250,8 @@
                                                     <input type="text" name="Description[]" id="Description_1"
                                                         class=" form-control ">
                                                 </td>
-                                                <td class="d-none">
-                                                    <input type="number" name="Qty[]" id="Qty_1"
+                                                <td >
+                                                    <input type="number" name="BaseAmount[]" id="BaseAmount_1"
                                                         class=" form-control changesNo" autocomplete="off"
                                                         onkeypress="return IsNumeric(event);" ondrop="return false;"
                                                         onpaste="return false;" step="0.01" value="1">
@@ -305,7 +310,6 @@
 
                             </div>
 
-
                             <div class="row mt-4">
 
                                 <div class="col-lg-8 col-12  ">
@@ -326,17 +330,10 @@
 
                                     </div>
 
-
-
-
-
-
-
                                 </div>
 
 
                                 <div class="col-lg-4 col-12 ">
-                                    <!-- <input type="text" class="form-control" id="TotalTaxAmount" name="TaxTotal" placeholder="TaxTotal" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;"> -->
                                     <form class="form-inline">
                                         <div class="form-group mt-1">
                                             <label>Grand Total Tax: &nbsp;</label>
@@ -470,27 +467,8 @@
                                 </div>
                             </div>
                             <div>
-
-
-
                             </div>
-
-
-
-
-
                 </form>
-
-                <!--  <div class='row'>
-                      <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
-                        <div class="well text-center">
-                      <h2>Back TO Tutorial: <a href="#"> Invoice System </a> </h2>
-                    </div>
-                      </div>
-                    </div>   -->
-
-
-
             </div>
         </div>
     </div>
@@ -499,750 +477,330 @@
 
 
     <script>
-        $('input[name=tax_action]').change(function(e) {
-            $('.exclusive_cal').val(e.target.value)
-        })
+    $('input[name=tax_action]').change(function(e) {
+        $('.exclusive_cal').val(e.target.value);
+    });
 
+    var i = $('table tr').length;
 
-        /**
-         * Site : http:www.smarttutorials.net
-         * @author muni
-         */
+    $(".addmore").on('click', function() {
+        html = '<tr class="border-1 border-light">';
+        html += '<td class="p-1 text-center"><input class="case" type="checkbox"/></td>';
+        html += '<td><select name="ItemID0[]" id="ItemID0_' + i + '" style="width: 300px !important;" class="form-select select2 changesNoo" onchange="km(this.value,' + i + ');" > <option value="">select</option>}@foreach ($items as $key => $value) <option value="{{ $value->ChartOfAccountID }}|{{ $value->ChartOfAccountName }}">{{ $value->ChartOfAccountName }}</option>@endforeach</select><input type="hidden" name="ChartOfAccountID[]" id="ItemID_' + i + '"></td>';
+        html += '<td><input type="text" name="Description[]" id="Description_' + i + '" class="form-control"></td>';
+        html += '<td class="d-none"><input type="text" name="BaseAmount[]" id="BaseAmount_' + i + '" class="form-control changesNo" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="1"></td>';
+        html += '<td><input type="text" name="Price[]" id="Price_' + i + '" class="form-control changesNo" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="1"></td>';
+        html += '<td><select name="Tax[]" id="TaxID_' + i + '" class="form-select changesNo exclusive_cal"><?php foreach ($tax as $key => $valueX1) : ?><option value="{{ $valueX1->TaxPer }}">{{ $valueX1->Description }}</option><?php endforeach ?></select></td>';
+        html += '<td><input type="number" name="TaxVal[]" id="TaxVal_' + i + '" class="form-control totalLinePrice2 tax" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" step="0.01"></td>';
+        html += '<td><input type="text" name="ItemTotal[]" id="ItemTotal_' + i + '" class="form-control totalLinePrice" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;"></td>';
+        html += '</tr>';
 
-        var i = $('table tr').length;
-        $(".addmore").on('click', function() {
-            html = '<tr class="  border-1 border-light">';
-            html += '<td class="p-1 text-center"><input class="case" type="checkbox"/></td>';
-            html += '<td><select name="ItemID0[]" id="ItemID0_' + i +
-                '"  style="width: 300px !important;" class="form-select select2 changesNoo" onchange="km(this.value,' +
-                i +
-                ');" > <option value="">select</option>}@foreach ($items as $key => $value) <option value="{{ $value->ChartOfAccountID }}|{{ $value->ChartOfAccountName }}">{{ $value->ChartOfAccountName }}</option>@endforeach</select><input type="hidden" name="ChartOfAccountID[]" id="ItemID_' +
-                i + '"></td>';
+        $('table').append(html);
+        $('.select2', 'table').select2();
+        i++;
+    });
 
+    // check all checkboxes
+    $(document).on('change', '#check_all', function() {
+        $('input[class=case]:checkbox').prop("checked", $(this).is(':checked'));
+    });
 
+    // delete selected rows
+    $(".delete").on('click', function() {
+        $('.case:checkbox:checked').parents("tr").remove();
+        $('#check_all').prop("checked", false);
+        calculateTotal();
+    });
 
-            html += '  <td><input type="text" name="Description[]" id="Description_' + i +
-                '" class=" form-control " ></td>';
-            html += '<td class="d-none";><input type="text" name="Qty[]" id="Qty_' + i +
-                '" class="form-control changesNo" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="1"></td>';
+    function km(v, id) {
+        var val = $('#ItemID0_' + id).val().split("|");
+        $('#ItemID_' + id).val(val[0]);
 
-            html += '<td class="d-none"><input type="text" name="Price[]" id="Price_' + i +
-                '" class="form-control changesNo " autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="1"></td>';
+        calculateTotal();
+        if (isNaN($('#discountAmount').val())) {
+            $('#discountAmount').val(0);
+        }
+        calculatediscount();
+        calculateTotal();
+    }
 
-            html += '<td><select name="Tax[]" id="TaxID_' + i +
-                '" class="form-select changesNo exclusive_cal"><?php foreach ($tax as $key => $valueX1) : ?><option value="{{ $valueX1->TaxPer }}">{{ $valueX1->Description }}</option><?php endforeach ?></select></td>';
+    $(document).on(' keyup blur select', '.changesNoo123', function() {
+        var id = $(this).attr('id').split("_")[1];
+        var data = <?php echo $item; ?>;
 
+        var item_idd = $('#ItemID_' + id).val();
+        var json = data.find(item => item.ItemID == parseInt(item_idd));
 
-            html += '<td><input type="number" name="TaxVal[]" id="TaxVal_' + i +
-                '" class=" form-control totalLinePrice2 tax "autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" step="0.01"></td>';
+        $('#BaseAmount_' + id).val(1);
+        $('#Price_' + id).val(json["SellingPrice"]);
+        calculateRowTotal(id);
+        calculatediscount();
+        calculateTotal();
+    });
 
+    function calculateRowTotal(id) {
+        var Qty = parseFloat($('#BaseAmount_' + id).val()) || 1;
+        var Price = parseFloat($('#Price_' + id).val()) || 0;
+        var TaxPer = parseFloat($('#TaxID_' + id).val()) || 0;
 
+        var TaxTypeVal = $('#TaxType').val(); // Inclusive / Exclusive
+        var TotalPrice = Qty * Price;
+        var TaxValue = 0;
+        var ItemTotal = 0;
 
-
-            html += '<td><input type="text" name="ItemTotal[]" id="ItemTotal_' + i +
-                '" class="form-control totalLinePrice" autocomplete="off" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;"></td>';
-
-            html += '</tr>';
-            $('table').append(html);
-            $('.select2', 'table').select2();
-            i++;
-
-
-
-            // var data=<?php //echo $item;
-            ?>
-            // // var data=JSON.parse({{ $item }});
-
-            // let country = data.find(value => value.ItemCode === "AP");
-            // // => {name: "Albania", code: "AL"}
-            // console.log(country);
-            // console.log(country["ItemCode"]);
-
-        });
-
-
-
-
-
-        //to check all checkboxes
-        $(document).on('change', '#check_all', function() {
-            $('input[class=case]:checkbox').prop("checked", $(this).is(':checked'));
-        });
-
-        //deletes the selected table rows
-
-        // var data=JSON.parse({{ $item }});
-
-        // let country = data.find(value => value.ItemCode === "AP");
-        // // => {name: "Albania", code: "AL"}
-        // console.log(country);
-        // console.log(country["ItemCode"]);
-
-        //org
-        //$(document).on('  keyup blur select','.changesNoo',function(){
-
-
-        function km(v, id) {
-
-
-
-            // alert(v+id);
-
-            id_arr = 'ItemID0_' + id;
-            id = id_arr.split("_");
-
-            val = $('#ItemID0_' + id[1]).val().split("|");
-
-
-            // alert($('#ItemID0_'+id[1]).val());
-            $('#ItemID_' + id[1]).val(val[0]);
-
-
-
-            // alert('val done');
-
-
-
-
-
-
-            calculateTotal();
-
-            if (isNaN($('#discountAmount').val())) {
-                $('#discountAmount').val(0);
-            }
-
-            calculatediscount();
-            calculateTotal();
-
-
-
+       if (TaxTypeVal === "Inclusive") {
+            TaxValue = TotalPrice * TaxPer / (100 + TaxPer);
+            ItemTotal = TotalPrice - TaxValue;  // Base amount (without VAT)
+        } else {
+            TaxValue = TotalPrice * TaxPer / 100;
+            ItemTotal = TotalPrice + TaxValue;
         }
 
+        $('#TaxVal_' + id).val(TaxValue.toFixed(2));
+        $('#ItemTotal_' + id).val(ItemTotal.toFixed(2));
 
+        calculateTotal();
+    }
 
+    // trigger row total on Qty, Price, Tax change
+    $(document).on('change keyup blur', '.changesNo', function() {
+        var id = $(this).attr('id').split("_")[1];
+        calculateRowTotal(id);
+    });
 
+    $(document).on('change', '.changesNoo', function() {
+        var id = $(this).attr('id').split("_")[1];
+        var val = $('#ItemID0_' + id).val().split("|");
+        $('#ItemID_' + id).val(val[0]);
+        calculatediscount();
+    });
 
+    function calculatediscount() {
+        var subTotal = 0;
+        $('.totalLinePrice').each(function() {
+            if ($(this).val() != '') subTotal += parseFloat($(this).val());
+        });
+        subTotal = parseFloat($('#subTotal').val());
 
+        var discountper = $('#discountper').val();
+        if (discountper != '' && typeof(discountper) != "undefined") {
+            var discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
+            $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
+            var total = subTotal - discountamount;
+            $('#totalafterdisc').val(total.toFixed(2));
+        } else {
+            $('#discountper').val(0);
+            $('#discountAmount').val(0);
+            $('#totalafterdisc').val(subTotal.toFixed(2));
+        }
+    }
 
+    $(document).on('blur', '#discountAmount', function() {
+        calculatediscountper();
+    });
 
+    function calculatediscountper() {
+        var subTotal = 0;
+        $('.totalLinePrice').each(function() {
+            if ($(this).val() != '') subTotal += parseFloat($(this).val());
+        });
+        subTotal = parseFloat($('#subTotal').val());
 
-        $(document).on(' keyup blur select', '.changesNoo123', function() {
+        var discountAmount = $('#discountAmount').val();
+        if (discountAmount != '' && typeof(discountAmount) != "undefined") {
+            var discountper = (parseFloat(discountAmount) / parseFloat(subTotal)) * 100;
+            $('#discountper').val(parseFloat(discountper.toFixed(2)));
+            var total = subTotal - discountAmount;
+            $('#totalafterdisc').val(total.toFixed(2));
+        } else {
+            $('#discountper').val(0);
+            $('#totalafterdisc').val(subTotal.toFixed(2));
+        }
+    }
 
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
+    $(document).on('change keyup blur', '#discountper', function() {
+        calculatediscount();
+        calculateTotal();
+    });
 
+    $(document).on('change keyup blur', '#taxpercentage', function() {
+        calculateTotal();
+    });
 
-            var data = <?php echo $item; ?>;
+    $(document).on('change keyup blur', '#shipping', function() {
+        calculateTotal();
+    });
 
-            var data = <?php echo $item; ?> // this is dynamic data in json_encode(); from controller
+    function calculateTotal() {
+        var subTotal = 0;
+        var totalTax = 0;
+        var grandTotal = 0;
 
-            var item_idd = $('#ItemID_' + id[1]).val();
-
-            var index = -1;
-            var val = parseInt(item_idd);
-            var json = data.find(function(item, i) {
-                if (item.ItemID === val) {
-                    index = i + 1;
-                    return i + 1;
-                }
-            });
-
-            $('#Qty_' + id[1]).val(1);
-            $('#Price_' + id[1]).val(json["SellingPrice"]);
-
-
-
-            $('#ItemTotal_' + id[1]).val((parseFloat(json["SellingPrice"]) * parseFloat($('#Qty_' + id[1]).val()))
-                .toFixed(2));
-
-
-
-            calculateTotal();
-
-            if (isNaN($('#discountAmount').val())) {
-                $('#discountAmount').val(0);
+        $(".totalLinePrice").each(function() {
+            if ($(this).val() !== '') {
+                subTotal += parseFloat($(this).val());
             }
-
-            calculatediscount();
-            calculateTotal();
-
-
-
         });
 
-
-
-        //deletes the selected table rows
-        $(".delete").on('click', function() {
-            $('.case:checkbox:checked').parents("tr").remove();
-            $('#check_all').prop("checked", false);
-            calculateTotal();
+        $(".totalLinePrice2").each(function() {
+            if ($(this).val() !== '') {
+                totalTax += parseFloat($(this).val());
+            }
         });
 
+        var TaxTypeVal = $('#TaxType').val(); // Inclusive / Exclusive
+
+        if (TaxTypeVal === "Inclusive") {
+            // In this case subTotal = Net Amount
+            // Grand Total = Net amount + VAT
+            grandTotal = subTotal + totalTax;
+        } else {
+            // Exclusive case: ItemTotal already includes VAT
+            grandTotal = subTotal;
+        }
+
+        $("#grandtotaltax").val(totalTax.toFixed(2));
+        $("#subTotal").val(subTotal.toFixed(2));
+        $("#grandtotal").val(grandTotal.toFixed(2));
+    }
 
 
+    $(document).on('change keyup blur', '#amountPaid', function() {
+        calculateAmountDue();
+    });
 
+    function calculateAmountDue() {
+        var amountPaid = parseFloat($('#amountPaid').val()) || 0;
+        var total = parseFloat($('#grandtotal').val()) || 0;
+        var amountDue = total - amountPaid;
+        $('.amountDue').val(amountDue.toFixed(2));
+    }
 
+    var specialKeys = [8, 46]; // Backspace, Delete
+    function IsNumeric(e) {
+        var keyCode = e.which ? e.which : e.keyCode;
+        return ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
+    }
 
-
-        //price change
-        $(document).on('change keyup blur ', '.changesNo', function() {
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-            Qty = $('#Qty_' + id[1]).val();
-
-            TaxPer = $('#TaxID_' + id[1]).val();
-
-            Price = $('#Price_' + id[1]).val();
-
-            TotalPrice = parseFloat(Qty) * parseFloat(Price);
-
-            TotalTaxPer = (parseFloat(TaxPer) / 100) * parseFloat(TotalPrice);
-
-
-
-
-
-
-
-            ItemTotal = parseFloat(TotalPrice) + parseFloat(TotalTaxPer);
-
-
-
-            // $('#ItemTotal_' + id[1]).val(ItemTotal);
-            // $('#TaxVal_' + id[1]).val(parseFloat(TotalTaxPer));
-
-
-
-            //
-            // console.log('new line');
-            // console.log('qty=');
-
-            // console.log(Qty);
-
-            // console.log('price');
-
-
-            // console.log(Price);
-
-
-            // console.log('---');
-
-
-
-            // console.log('----total price');
-            // console.log(TotalPrice);
-
-            // console.log('taxper');
-
-
-            // console.log(TaxPer);
-
-            // console.log('--taxamount-');
-            // console.log(TaxAmount);
-            // console.log('discount');
-            // console.log(discount);
-            // console.log('total price');
-            // console.log(TotalPrice);
-
-            // console.log('grand item total');
-            // console.log(ItemTotal);
-
-
-
-
-
-
-
-
-
-
-
-
-            // $('#ItemTotal_'+id[1]).val(  (parseFloat(json["SellingPrice"])*parseFloat( $('#Qty_'+id[1]).val() ) + parseFloat($('#TaxAmount_'+id[1]).val() )  - (parseFloat($('#discount_'+id[1]).val()) )    ).toFixed(2)   );
-
-
-
-
-
-            calculatediscount();
-            calculateTotal();
+    $(function() {
+        $.fn.datepicker.defaults.format = "dd-mm-yyyy";
+        $('#invoiceDate').datepicker({
+            startDate: '-3d',
+            autoclose: true,
+            clearBtn: true,
+            todayHighlight: true
         });
+    });
 
-        //////////
-
-        $(document).on(' blur', '.totalLinePrice', function() {
-
-
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-
-
-            total = $('#ItemTotal_' + id[1]).val();
-
-            taxper = $('#TaxID_' + id[1]).val();
-
-
-            tax = (total * taxper) / 100;
-
-            $('#TaxVal_' + id[1]).val(tax);
-
-
-
-            taxtotal = 0;
-            $('.tax').each(function() {
-                if ($(this).val() != '') taxtotal += parseFloat($(this).val());
-            });
-
-
-
-
-            $('#grandtotaltax').val(taxtotal);
-
-            gtotal = 0;
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') gtotal += parseFloat($(this).val());
-            });
-
-
-            $('#grandtotal').val(gtotal);
-            calculateTotal();
-            // Profit = (parseFloat(total)-parseFloat(Fare)).toFixed(2) ;
-
-            // Tax = ;
-
-            // Service = (parseFloat(Proft)-parseFloat(Tax)).toFixed(2) ;
-
-            // alert(Profit+Tax+Service);
-
-            // $('#quantity'+id[1]).val( Tax );
-            // $('#Service_'+id[1]).val( Service );
-
-
-
-        });
-
-        $(document).on('change', '.changesNoo', function() {
-
-
-
-            id_arr = $(this).attr('id');
-            id = id_arr.split("_");
-
-            val = $('#ItemID0_' + id[1]).val().split("|");
-
-
-            // alert($('#ItemID0_'+id[1]).val());
-            $('#ItemID_' + id[1]).val(val[0]);
-
-
-            calculatediscount();
-
-        });
-
-        ////////////////////////////////////////////
-
-        function calculatediscount() {
-            subTotal = 0;
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') subTotal += parseFloat($(this).val());
-            });
-            subTotal = parseFloat($('#subTotal').val());
-
-
-            discountper = $('#discountper').val();
-            // totalafterdisc = $('#totalAftertax').val();
-            // console.log('testing'.totalAftertax);
-            if (discountper != '' && typeof(discountper) != "undefined") {
-                discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
-
-                $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
-                total = subTotal - discountamount;
-                $('#totalafterdisc').val(total.toFixed(2));
-                // $('#grandtotal').val(total.toFixed(2));
-
+    $(function() {
+        $('#WalkinCustomer').hide();
+        $('#PartyID').change(function() {
+            if (this.value == '1') {
+                $('#WalkinCustomer').show();
+                $('#1WalkinCustomerName').focus();
             } else {
-                $('#discountper').val(0);
-                // alert('dd');
-                $('#DiscountAmount').val(0);
-                total = subTotal;
-                $('#totalafterdisc').val(total.toFixed(2));
-
+                $('#WalkinCustomer').hide();
+                $('#1WalkinCustomerName').val(0);
             }
-
-        }
-
-
-        $(document).on('blur', '#discountAmount', function() {
-
-
-            calculatediscountper();
-
         });
+    });
 
-        function calculatediscountper() {
-            subTotal = 0;
-
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') subTotal += parseFloat($(this).val());
-            });
-            subTotal = parseFloat($('#subTotal').val());
-
-
-            discountAmount = $('#discountAmount').val();
-            // totalafterdisc = $('#totalAftertax').val();
-            // console.log('testing'.totalAftertax);
-            if (discountAmount != '' && typeof(discountAmount) != "undefined") {
-                discountper = (parseFloat(discountAmount) / parseFloat(subTotal)) * 100;
-
-                $('#discountper').val(parseFloat(discountper.toFixed(2)));
-                total = subTotal - discountAmount;
-                $('#totalafterdisc').val(total.toFixed(2));
-                // $('#grandtotal').val(total.toFixed(2));
-
+    $(function() {
+        $('#paymentdetails').hide();
+        $('#PaymentMode').change(function() {
+            if (this.value == 'Cheque') {
+                $('#paymentdetails').show();
+                $('#PaymentDetails').focus();
             } else {
-                $('#discountper').val(0);
-                // alert('dd');
-                $('#discountper').val(0);
-                total = subTotal;
-                $('#totalafterdisc').val(total.toFixed(2));
+                $('#paymentdetails').hide();
+                $('#PaymentDetails').val('');
+            }
+        });
+    });
 
+    function ajax_balance(SupplierID) {
+        if (!SupplierID) return alert('Please Select Branch');
+
+        $.ajax({
+            url: "{{ URL('/Ajax_Balance') }}",
+            type: "POST",
+            data: {_token: $("#csrf").val(), SupplierID: SupplierID},
+            cache: false,
+            success: function(data) {
+                $('#result').html(data);
+            }
+        });
+    }
+
+    $("#InvoiceType").change(function() {
+        var InvoiceType = $('#InvoiceType').val();
+        if (!InvoiceType) return;
+
+        $.ajax({
+            url: "{{ URL('/ajax_invoice_vhno') }}",
+            type: "POST",
+            data: {_token: $("#csrf").val(), InvoiceType: InvoiceType},
+            cache: false,
+            success: function(data) {
+                $('#invoict_type').html(data);
+            }
+        });
+    });
+
+    function GetSelectedTextValue(seletedVal) {
+        var gTotalVal = parseFloat($('#grandtotal').val());
+        if (!gTotalVal) return alert("Please create invoice first");
+
+        if (confirm("Are you sure you want to update tax of complete invoice!")) {
+            var TaxValue = seletedVal.value;
+            var table_lenght = $('table tr').length;
+            var grandsum = 0;
+            var taxsum = 0;
+
+            for (let i = 1; i < table_lenght; i++) {
+                var Qty = parseFloat($('#BaseAmount_' + i).val()) || 0;
+                var Price = parseFloat($('#Price_' + i).val()) || 0;
+
+                $('#TaxID_' + i).val(TaxValue);
+                var disPerLine = (Price * TaxValue / 100);
+                $('#TaxVal_' + i).val(disPerLine.toFixed(2));
+                $('#ItemTotal_' + i).val((Qty * Price + disPerLine).toFixed(2));
+
+                grandsum += (Qty * Price + disPerLine);
+                taxsum += disPerLine;
             }
 
+            $('#grandtotaltax').val(taxsum.toFixed(2));
+            $('#subTotal').val(grandsum.toFixed(2));
+
+            var discountper = parseFloat($('#discountper').val()) || 0;
+            var discountamount = grandsum * (discountper / 100);
+            $('#discountAmount').val(discountamount.toFixed(2));
+            $('#totalafterdisc').val((grandsum - discountamount).toFixed(2));
+
+            var taxper = parseFloat($('#taxpercentage').val()) || 0;
+            var taxamount = grandsum * (taxper / 100);
+            $('#taxpercentageAmount').val(taxamount.toFixed(2));
+
+            var shipping = parseFloat($('#shipping').val()) || 0;
+            var grandtotal = (grandsum + taxamount + shipping - discountamount);
+            $('#grandtotal').val(grandtotal.toFixed(2));
+        } else {
+            $('#seletedVal').val('select');
         }
+    }
+    $('#TaxType').on('change', function () {
+        recalcAllRows();
+    });
 
-        //////////////////
-
-        // discount percentage
-        $(document).on('change keyup blur onmouseover onclick', '#discountper', function() {
-            calculatediscount();
-
-
-            calculateTotal();
-
+    function recalcAllRows() {
+        $('input[name="BaseAmount[]"]').each(function () {
+            var id = $(this).attr('id').split("_")[1];
+            calculateRowTotal(id);
         });
-        $(document).on('change keyup blur   onclick', '#taxpercentage', function() {
-            calculateTotal();
-        });
+    }
 
 
-        $(document).on('change keyup blur   onclick', '#shipping', function() {
-            calculateTotal();
-        });
-
-
-
-        //total price calculation
-        function calculateTotal() {
-
-            // grand_tax = 0;
-            grand_tax = 0;
-            subTotal = 0;
-            total = 0;
-            total2 = 0;
-            sumtax = 0;
-            gt = 0;
-            grandtotaltax = 0;
-            var pretotal = 0;
-
-            $('.totalLinePrice').each(function() {
-                if ($(this).val() != '') subTotal += parseFloat($(this).val());
-            });
-            $('.totalLinePrice2').each(function() {
-                if ($(this).val() != '') grandtotaltax += parseFloat($(this).val());
-            });
-
-            $('#grandtotaltax').val(grandtotaltax.toFixed(2));
-            console.log(grandtotaltax);
-            discountper = $('#discountper').val();
-
-            if (discountper != '' && typeof(discountper) != "undefined") {
-
-            }
-
-            $('#subTotal').val(subTotal.toFixed(2));
-            pretotal = $('#totalafterdisc').val();
-            discountAmount = $('#discountAmount').val();
-            tax = $('#tax').val();
-            grand_tax = $('#taxpercentage').val();
-
-            if (grand_tax != '' && typeof(grand_tax) != "undefined") {
-                gt = subTotal * (parseFloat(grand_tax) / 100);
-
-                $('#taxpercentageAmount').val(gt.toFixed(2));
-                total2 = subTotal + gt - discountAmount;
-            } else {
-                $('#taxpercentage').val(0);
-                total2 = subTotal - pretotal;
-            }
-
-
-            shipping = parseFloat($('#shipping').val());
-
-            shipping_grand = shipping + total2;
-            $('#grandtotal').val(shipping_grand.toFixed(2));
-
-        }
-
-        $(document).on('change keyup blur', '#amountPaid', function() {
-            calculateAmountDue();
-        });
-
-        //due amount calculation
-        function calculateAmountDue() {
-            amountPaid = $('#amountPaid').val();
-            total = $('#grandtotal').val();
-            if (amountPaid != '' && typeof(amountPaid) != "undefined") {
-                amountDue = parseFloat(total) - parseFloat(amountPaid);
-                $('.amountDue').val(amountDue.toFixed(2));
-            } else {
-                total = parseFloat(total).toFixed(2);
-                $('.amountDue').val(total);
-            }
-        }
-
-
-        //It restrict the non-numbers
-        var specialKeys = new Array();
-        specialKeys.push(8, 46); //Backspace
-        function IsNumeric(e) {
-            var keyCode = e.which ? e.which : e.keyCode;
-            // console.log(keyCode);
-            var ret = ((keyCode >= 48 && keyCode <= 57) || specialKeys.indexOf(keyCode) != -1);
-            return ret;
-        }
-
-        //datepicker
-        $(function() {
-            $.fn.datepicker.defaults.format = "dd-mm-yyyy";
-            $('#invoiceDate').datepicker({
-                startDate: '-3d',
-                autoclose: true,
-                clearBtn: true,
-                todayHighlight: true
-            });
-        });
-    </script>
-
-    <!-- <script src="{{ asset('assets/js/jquery-3.6.0.js') }}" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-        crossorigin="anonymous"></script> -->
-
-    <script type="text/javascript">
-        //<![CDATA[
-
-
-        $(function() {
-            $('#WalkinCustomer').hide();
-            $('#PartyID').change(function() {
-
-                if (this.options[this.selectedIndex].value == '1') {
-                    // alert('dd');
-
-                    $('#WalkinCustomer').show();
-                    $('#1WalkinCustomerName').focus();
-
-                } else {
-                    $('#WalkinCustomer').hide();
-                    $('#1WalkinCustomerName').val(0);
-                }
-            });
-        });
-
-
-        //]]>
-    </script>
-    <script type="text/javascript">
-        //<![CDATA[
-
-
-        $(function() {
-            $('#paymentdetails').hide();
-            $('#PaymentMode').change(function() {
-
-                if (this.options[this.selectedIndex].value == 'Cheque') {
-                    // alert('dd');
-
-                    $('#paymentdetails').show();
-                    $('#PaymentDetails').focus();
-
-                } else {
-                    $('#paymentdetails').hide();
-                    $('#PaymentDetails').val('');
-                }
-            });
-        });
-
-
-        //]]>
-    </script>
-    <!-- ajax trigger -->
-    <script>
-        function ajax_balance(SupplierID) {
-
-            // alert($("#csrf").val());
-
-            $('#result').prepend('')
-            $('#result').prepend(
-                '<img id="theImg" src="{{ asset('
-                                                        assets / images / ajax.gif ') }}" />'
-                )
-
-            var SupplierID = SupplierID;
-
-            // alert(SupplierID);
-            if (SupplierID != "") {
-                /*  $("#butsave").attr("disabled", "disabled"); */
-                // alert(SupplierID);
-                $.ajax({
-                    url: "{{ URL('/Ajax_Balance') }}",
-                    type: "POST",
-                    data: {
-                        _token: $("#csrf").val(),
-                        SupplierID: SupplierID,
-
-                    },
-                    cache: false,
-                    success: function(data) {
-
-
-
-                        $('#result').html(data);
-
-
-
-                    }
-                });
-            } else {
-                alert('Please Select Branch');
-            }
-
-
-
-
-        }
-    </script>
-
-
-
-
-
-    <script>
-        $("#InvoiceType").change(function() {
-
-            // alert(p3WhH7hWcpfbcxtNskY1ZrCROfa3dpKp3MfEJwXu);
-
-            var InvoiceType = $('#InvoiceType').val();
-
-            // console.log(InvoiceType);
-            if (InvoiceType != "") {
-                /*  $("#butsave").attr("disabled", "disabled"); */
-                // alert('next stage if else');
-                // console.log(InvoiceType);
-
-                $.ajax({
-
-                    url: "{{ URL('/ajax_invoice_vhno') }}",
-                    type: "POST",
-                    data: {
-                        // _token: p3WhH7hWcpfbcxtNskY1ZrCROfa3dpKp3MfEJwXu,
-                        "_token": $("#csrf").val(),
-                        InvoiceType: InvoiceType,
-
-                    },
-                    cache: false,
-
-                    success: function(data) {
-
-                        // alert(data.success);
-                        $('#invoict_type').html(data);
-
-
-
-                    }
-                });
-            }
-
-        });
-    </script>
-    <script type="text/javascript">
-        function GetSelectedTextValue(seletedVal) {
-            gTotalVal = $('#grandtotal').val();
-            if (gTotalVal) {
-
-
-                var txt;
-                if (confirm("Are you sure you want to update tax of complete invoice!")) {
-                    txt = "You pressed OK!";
-
-                    var TaxValue = seletedVal.value;
-
-                    var table_lenght = $('table tr').length;
-                    let discountamount = 0;
-
-
-                    var grandsum = 0
-                    var taxsum = 0;
-                    for (let i = 1; i < table_lenght; i++) {
-                        Qty = $('#Qty_' + i).val();
-                        Price = $('#Price_' + i).val();
-
-
-                        $('#TaxID_' + i).val(TaxValue);
-                        disPerLine = parseFloat(Price) * (TaxValue / 100);
-                        $('#TaxVal_' + i).val(parseFloat(disPerLine));
-
-                        grandsum += (Qty * Price) + disPerLine;
-                        taxsum += disPerLine;
-
-                        $('#ItemTotal_' + i).val((Qty * Price) + disPerLine);
-
-                    }
-                    $('#grandtotaltax').val(parseFloat(taxsum));
-                    // assigning subtotal value
-                    $('#subTotal').val(parseFloat(grandsum));
-
-
-                    // fetching discount percentage
-                    var discountper = $('#discountper').val();
-                    // calculating discount amount
-                    discountamount = parseFloat(grandsum) * (parseFloat(discountper) / 100);
-                    $('#discountAmount').val(parseFloat(discountamount));
-                    //amount after discount
-                    $('#totalafterdisc').val(parseFloat(grandsum) - parseFloat(discountamount));
-
-                    // fetching percentage of tax
-                    var taxper = $('#taxpercentage').val();
-                    // calculating percentage amount
-                    taxamount = parseFloat(grandsum) * (parseFloat(taxper) / 100);
-                    $('#taxpercentageAmount').val(parseFloat(taxamount));
-
-                    //calculating shiping cost
-                    var shipping = $('#shipping').val();
-
-
-
-                    var grandtotal = (parseFloat(grandsum) + parseFloat(taxamount) + parseFloat(shipping)) - parseFloat(
-                        discountamount);
-                    // Calculating grandtotal
-                    $('#grandtotal').val(grandtotal);
-                    // alert(discountamount);
-                } else {
-                    $('#seletedVal').val('select');
-                }
-
-            } else {
-                return alert("Please create invoice first");
-            }
-        }
-    </script>
-
-
-
-    <!-- END: Content-->
+</script>
 
 @endsection

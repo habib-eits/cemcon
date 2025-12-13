@@ -1520,7 +1520,9 @@ class Accounts extends Controller
           $current_year = date('Y');
  
          if ($invoice_year < $current_year) {
-             return redirect()->back()->with('error', 'You cannot delete an invoice from a previous year.')->with('class', 'danger');
+             return redirect('/Invoice')
+                ->with('error', 'You cannot delete an invoice from a previous year.')
+                ->with('class', 'error');
          }
 
         $id1 = DB::table('invoice_master')->where('InvoiceMasterID', $id)->delete();
@@ -3458,7 +3460,13 @@ class Accounts extends Controller
         $pagetitle = 'Party Balance';
 
 
-        $party = DB::table('party')->get();
+        if ($request->PartyID != '') {
+            $party = DB::table('party')
+                        ->where('PartyID', $request->PartyID)
+                        ->get();
+        } else {
+            $party = DB::table('party')->get();
+        }
 
 
         return  View('party_balance1', compact('party', 'pagetitle'));
@@ -9378,6 +9386,8 @@ $vhno = DB::table('expense_master')
             'Tax' => $request->grandtotaltax,
             'GrantTotal' => $request->Grandtotal,
             'Paid' => $request->amountPaid,
+            'TaxType'          => $request->TaxType,          // Inclusive / Exclusive
+            'Amount' => array_sum($request->BaseAmount), 
         );
         // dd($challan_mst);
         // $id= DB::table('')->insertGetId($data);
@@ -9634,6 +9644,8 @@ $vhno = DB::table('expense_master')
             'Tax' => $request->grandtotaltax,
             'GrantTotal' => $request->Grandtotal,
             'GrantTotal' => $request->Grandtotal,
+            'TaxType'          => $request->TaxType,          // Inclusive / Exclusive
+            'Amount' => array_sum($request->BaseAmount),
         );
         // dd($challan_mst);
         // $id= DB::table('')->insertGetId($data);
@@ -10243,32 +10255,45 @@ $vhno = DB::table('expense_master')
     public function ExpenseReport1(request $request)
     {
 
-         $pagetitle = 'Expense Report';
+        $pagetitle = 'Expense Report';
 
 
         $company = DB::table('company')->get();
 
         $expense_detail = DB::table('v_expense_detail')
-    ->whereBetween('Date', [$request->StartDate, $request->EndDate])
-    ->when($request->JobID, function ($query, $JobID) {
-        return $query->where('JobID', $JobID);
-    })
-    ->orderBy('Date')
-    ->get();
+        ->whereBetween('Date', [$request->StartDate, $request->EndDate])
+        ->when($request->JobID, function ($query, $JobID) {
+            return $query->where('JobID', $JobID);
+        })
+        ->orderBy('Date')
+        ->get();
 
 
        $summary = DB::table('v_expense_detail')
         ->select('ChartOfAccountName',DB::raw('sum(Tax) as Tax, sum(Amount) as TotalAmount'))
-    ->whereBetween('Date', [$request->StartDate, $request->EndDate])
-    ->when($request->JobID, function ($query, $JobID) {
-        return $query->where('JobID', $JobID);
-    })
-    ->orderBy('Date')
-    ->groupby('ChartOfAccountName')
-    ->get();
+        ->whereBetween('Date', [$request->StartDate, $request->EndDate])
+        ->when($request->JobID, function ($query, $JobID) {
+            return $query->where('JobID', $JobID);
+        })
+        ->groupby('ChartOfAccountName')
+        ->get();
+
+        // $job = DB::table('v_job')
+        // ->where('JobID', session::get('JobID'))
+        // ->first();     // <-- THIS fixes the error
+
+        $job = DB::table('job as j')
+        ->leftJoin('v_job as v', 'v.JobID', '=', 'j.JobID')
+        ->select(
+            'j.JobNo',   
+            'v.PartyName'
+        )
+        ->where('j.JobID', $request->XJobID)
+        ->first();
+
 
  
-        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary'));
+        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary', 'job'));
         //return $pdf->download('pdfview.pdf');
         // $pdf->setpaper('A4', 'portiate');
     }
