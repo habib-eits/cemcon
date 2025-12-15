@@ -7,32 +7,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <title>Expense Detail</title>
- 
+
 </head>
 
 <body>
     <div class="container mt-5">
-  
 
-        <div class="row"  >
+
+        <div class="row">
             <div class="col-md-4">
-                <div >
-                    <img width="150px" src="{{asset('/documents/'.$company[0]->Logo)}}" alt="">
+                <div>
+                    <img width="150px" src="{{ asset('/documents/' . $company[0]->Logo) }}" alt="">
 
                 </div>
 
             </div>
             <div class="col-md-8">
                 <span class="font"><strong>
-                        <h3>{{$company[0]->Name}}</h3>
+                        <h3>{{ $company[0]->Name }}</h3>
                     </strong>
-                    TRN # {{$company[0]->TRN}},<br>
-                    {{$company[0]->Address}}<br>
-                    {{$company[0]->Contact}}<br>
-                    {{$company[0]->Email}}
+                    TRN # {{ $company[0]->TRN }},<br>
+                    {{ $company[0]->Address }}<br>
+                    {{ $company[0]->Contact }}<br>
+                    {{ $company[0]->Email }}
 
                 </span>
 
@@ -54,34 +55,35 @@
                             <tbody class="font">
                                 <tr>
                                     <td>Payment Date</td>
-                                    <th>{{$expense_master[0]->Date	}}</th>
+                                    <th>{{ $expense_master[0]->Date }}</th>
                                 </tr>
                                 <tr>
                                     <td>Reference Number</td>
-                                    <th>{{$expense_master[0]->ReferenceNo	}}</th>
-                                </tr>  
+                                    <th>{{ $expense_master[0]->ReferenceNo }}</th>
+                                </tr>
 
                                 <tr>
                                     <td>Job No</td>
-                                    <th>{{$expense_master[0]->JobNo   }}</th>
+                                    <th>{{ $expense_master[0]->JobNo }}</th>
                                 </tr>
                                 <tr>
                                     <td>Expense No</td>
-                                    <th>{{$expense_master[0]->ExpenseNo	}}</th>
+                                    <th>{{ $expense_master[0]->ExpenseNo }}</th>
                                 </tr>
-                                
+
                             </tbody>
                         </table>
                         Bill To:
                         <br>
-                        <strong style="font-weight: bold;" class="font">{{$expense_master[0]->SupplierName}}</strong>
-                       
+                        <strong style="font-weight: bold;"
+                            class="font">{{ $expense_master[0]->SupplierName }}</strong>
+
                     </div>
                     <div class="col-4">
                         <div class="bg-info text-center pt-4" style="height: 45%; width: 70%; margin-left: -20%;">
                             <span class="font" style="color: white;">
                                 Amount Paid <br>
-                                {{session::get('Currency')}} {{$expense_master[0]->GrantTotal	}}
+                                {{ session::get('Currency') }} {{ number_format($expense_master[0]->GrantTotal, 2) }}
                             </span>
                         </div>
 
@@ -89,52 +91,72 @@
                 </div>
                 <hr>
 
-                 @if(count($expense_detail)>0)        
-                <table class="table table-sm align-middle table-nowrap mb-0">
-                <tbody><tr class="bg-light">
-                <th scope="col" class="col-md-1">S.No</th>
-                <th scope="col" class="col-md-2">Expense No</th>
-                <th scope="col" class="col-md-3">Description</th>
-                <th scope="col" class="col-md-3">Expense Account</th>
-                <th scope="col" class="col-md-2">Amount</th>
-                </tr>
-                </tbody>
-                <tbody>
-                @foreach ($expense_detail as $key =>$value)
-                 <tr>
-                 <td >{{$key+1}}</td>
-                 <td >{{$value->ExpenseNo}}</td>
-                 <td >{{$value->Notes}}</td>
-                 <td >{{$value->ChartOfAccountName}}</td>
-                 <td >{{$value->Amount}}</td>
-                 </tr>
-                 @endforeach   
-                 <tr class="font-weight-bolder">
-                     <td></td>
-                     <td></td>
-                     <td>Total</td>
-                     <td>{{$expense_master[0]->GrantTotal   }} {{session::get('Currency')}} </td>
-                 </tr>
-                 </tbody>
+                @if (count($expense_detail) > 0)
+                    <table class="table table-sm align-middle table-nowrap mb-0">
+                        <tbody>
+                            <tr class="bg-light">
+                                <th scope="col" class="col-md-1">S.No</th>
+                                <th scope="col" class="col-md-2">Expense No</th>
+                                <th scope="col" class="col-md-3">Description</th>
+                                <th scope="col" class="col-md-3">Expense Account</th>
+                                <th class="col-md-2">Tax Type</th>
+                                <th scope="col" class="col-md-2">Amount</th>
+                                <th scope="col" class="col-md-2">Tax</th>
+                                <th scope="col" class="col-md-2">Total</th>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            @foreach ($expense_detail as $key => $value)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $value->ExpenseNo }}</td>
+                                    <td>{{ $value->Notes }}</td>
+                                    <td>{{ $value->ChartOfAccountName }}</td>
+                                    <td>
+                                        <span
+                                            class="badge {{ $expense_master[0]->TaxType == 'inclusive' ? 'badge-success' : 'badge-info' }}">
+                                            {{ ucfirst($expense_master[0]->TaxType) }}
+                                        </span>
+                                    </td>
+                                    {{-- <td >{{$value->Amount}}</td> --}}
+                                    <td>{{ number_format($value->Amount, 2) }}</td>
+                                    <td>{{ number_format($value->Tax, 2) }}</td>
+                                    <td>{{ number_format($value->Total, 2) }}</td>
+                                </tr>
+                            @endforeach
+                            <tr class="font-weight-bolder">
+                                <td></td>
+                                <td></td>
+                                <td>Grand Total</td>
+                                <td>{{ number_format($expense_master[0]->GrantTotal, 2) }}
+                                    {{ session::get('Currency') }} </td>
+                            </tr>
+                        </tbody>
 
-                 </table>
-                 @else
-                   <p class=" text-danger">No data found</p>
-                 @endif   
+                    </table>
+                @else
+                    <p class=" text-danger">No data found</p>
+                @endif
 
             </div>
 
- <hr>
+            <hr>
 
- <div style="height: 250px;">.</div>
+            <div style="height: 250px;">.</div>
 
         </div>
     </div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
 </body>
 
 </html>

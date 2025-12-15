@@ -9762,10 +9762,23 @@ $vhno = DB::table('expense_master')
 
     public function ExpenseView($id)
     {
-
+    
         $pagetitle = 'Expense View ';
         $company = DB::table('company')->get();
-        $expense_master = DB::table('v_expense')->where('ExpenseMasterID', $id)->get();
+        // $expense_master = DB::table('v_expense')->where('ExpenseMasterID', $id)->get();
+        $expense_master = DB::table('expense_master')
+        ->leftJoin('supplier', 'supplier.SupplierID', '=', 'expense_master.SupplierID')
+        ->leftJoin('job', 'job.JobID', '=', 'expense_master.JobID')
+        ->select(
+                'expense_master.*',
+                'supplier.SupplierName',
+                'job.JobNo'
+                )
+        ->where('ExpenseMasterID', $id)
+        ->get();
+
+        // dd($expense_master);
+
         $expense_detail = DB::table('v_expense_detail')->where('ExpenseMasterID', $id)->get();
         $journal = DB::table('journal')->where('ExpenseMasterID', $id)->get();
 
