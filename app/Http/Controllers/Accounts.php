@@ -3445,10 +3445,10 @@ class Accounts extends Controller
         $party = DB::table('party')->get();
 
         return view('party_balance', compact('pagetitle', 'party'));
-    }
+    } 
+    
     public function PartyBalance1(request $request)
     {
-
         ///////////////////////USER RIGHT & CONTROL ///////////////////////////////////////////
         $allow = check_role(session::get('UserID'), 'Party Balance', 'View');
         if ($allow == 0) {
@@ -3458,12 +3458,138 @@ class Accounts extends Controller
         $pagetitle = 'Party Balance';
 
 
-        $party = DB::table('party')->get();
+        $parties = DB::table('party')
+        ->select('PartyID','PartyName')
+        ->when($request->PartyID, function($query) use ($request){
+            $query->where('PartyID',$request->PartyID);
+        })
+        ->get();
+        $data = [];
+        $totalOB = 0;
+        $totalDr = 0;
+        $totalCr = 0;
+        $totalBal = 0;
 
+        foreach($parties as $party)
+        {
+            $openingBalance = DB::table('journal')
+                ->select('Date','PartyID','ChartOfAccountID','Dr','Cr')
+                ->where('PartyID', $party->PartyID)
+                ->where('ChartOfAccountID', 110400)
+                ->whereDate('date','>',request()->StartDate)
+                ->select(DB::raw('sum(if(ISNULL(Dr),0,Dr)-if(ISNULL(Cr),0,Cr)) as Balance'))
+                ->pluck('Balance')
+                ->first();
 
-        return  View('party_balance1', compact('party', 'pagetitle'));
+            $transactions = DB::table('journal')
+                ->select('Date','PartyID','ChartOfAccountID','Dr','Cr')
+                ->where('PartyID', $party->PartyID)
+                ->where('ChartOfAccountID', 110400)
+                ->select(DB::raw('sum(Dr) as Dr'), DB::raw('sum(Cr) as Cr'))
+                ->whereBetween('date', [$request->StartDate, $request->EndDate])
+                ->first();    
+
+            $opening = $openingBalance ?? 0;
+            $debit = $transactions->Dr ?? 0;
+            $credit = $transactions->Cr ?? 0;    
+
+            $totalOB += $opening;
+            $totalDr += $debit;
+            $totalCr += $credit;
+            
+              
+
+            $data[] = [
+                'partyId' => $party->PartyID,
+                'partyName' => $party->PartyName,
+                'openingBalance' => $opening,
+                'Debit' => $debit,
+                'Credit' => $credit,
+                'Balance' => $opening + ($debit - $credit),
+            ];
+            
+        }
+
+        $totalBal = $totalOB + $totalDr - $totalCr;
+
+        return  View('party_balance1', compact('data', 'pagetitle','totalBal','totalOB','totalDr','totalCr'));
     }
+    
+    /*   
+    public function PartyBalance1(request $request)
+    {
+        ///////////////////////USER RIGHT & CONTROL ///////////////////////////////////////////
+        $allow = check_role(session::get('UserID'), 'Party Balance', 'View');
+        if ($allow == 0) {
+            return redirect()->back()->with('error', 'You access is limited')->with('class', 'danger');
+        }
+        ////////////////////////////END SCRIPT ////////////////////////////////////////////////
+        $pagetitle = 'Party Balance';
 
+
+        $parties = DB::table('party')
+        ->when($request->PartyID, function($query) use ($request){
+            $query->where('PartyID',$request->PartyID);
+        })
+        ->get();
+        $partyIds = $parties->pluck('PartyID');
+
+        // 1️⃣ Opening balance sum for all parties in ONE query
+        $openingBalances = DB::table('journal')
+            ->whereIn('PartyID', $partyIds)
+            ->where('ChartOfAccountID', 110400)
+            ->whereDate('date', $request->StartDate)
+            ->select(
+                'PartyID',
+                DB::raw('SUM(IFNULL(Dr,0) - IFNULL(Cr,0)) AS Balance')
+            )
+            ->groupBy('PartyID')
+            ->pluck('Balance', 'PartyID');   // key = PartyID
+
+
+
+        // 2️⃣ Transactions (Dr & Cr) for all parties in ONE query
+        $transactionSums = DB::table('journal')
+            ->whereIn('PartyID', $partyIds)
+            ->where('ChartOfAccountID', 110400)
+            ->whereBetween('date', [$request->StartDate, $request->EndDate])
+            ->select(
+                'PartyID',
+                DB::raw('SUM(IFNULL(Dr,0)) AS Dr'),
+                DB::raw('SUM(IFNULL(Cr,0)) AS Cr')
+            )
+            ->groupBy('PartyID')
+            ->get()
+            ->keyBy('PartyID');   // key = PartyID
+
+
+
+        // 3️⃣ Build final result fast
+        $data = [];
+
+        foreach ($parties as $party) {
+
+            $opening = $openingBalances[$party->PartyID] ?? 0;
+
+            $trans = $transactionSums[$party->PartyID] ?? (object)['Dr' => 0, 'Cr' => 0];
+            $debit = $trans->Dr;
+            $credit = $trans->Cr;
+
+            $data[] = [
+                'partyId'        => $party->PartyID,
+                'partyName'      => $party->PartyName,
+                'openingBalance' => $opening,
+                'Debit'          => $debit,
+                'Credit'         => $credit,
+                'Balance'        => $opening + ($debit - $credit),
+            ];
+        }
+
+
+        // return  View('party_balance1', compact('data', 'pagetitle','totalBal','totalOB','totalDr','totalCr'));
+        return  View('party_balance1', compact('data', 'pagetitle'));
+    }
+    */
 
     public function PartyBalanceAreawise2PDF(request $request)
     {
@@ -9316,7 +9442,7 @@ $pagetitle='Purchase Order';
         $pagetitle = 'Expense';
 
         session::put('menu', 'Expense');
-        $chartofaccont = DB::table('chartofaccount')->whereIn('Category', ['CASH', 'CARD', 'BANK'])->get();
+        $chartOfAccounts = DB::table('chartofaccount')->whereIn('Category', ['CASH', 'CARD', 'BANK'])->get();
         $items = DB::table('chartofaccount')->where('Level', '3')->get();
         // $items = DB::table('chartofaccount')->where(DB::raw('right(L3,3)'),'<>',000)->get();
 
@@ -9354,7 +9480,7 @@ $vhno = DB::table('expense_master')
 
 
 
-        return view('expense.expense_create', compact('invoice_type', 'vhno', 'chartofaccont', 'tax', 'items', 'supplier', 'pagetitle', 'item', 'user','job'));
+        return view('expense.expense_create', compact('invoice_type', 'vhno', 'chartOfAccounts', 'tax', 'items', 'supplier', 'pagetitle', 'item', 'user','job'));
     }
 
 

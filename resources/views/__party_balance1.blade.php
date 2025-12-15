@@ -57,7 +57,7 @@
                 ?>
                 <div class="card">
                     <div class="card-body">
-                        @if (count($data) > 0)
+                        @if (count($party) > 0)
                             <table class="table table-striped table-sm">
                                 <tr>
                                     <td width="6%" bgcolor="#CCCCCC">
@@ -82,33 +82,55 @@
                                         <div align="right"><strong>BALANCE</strong></div>
                                     </td>
                                 </tr>
-                                @php
-                                  $i = 1;
-                                @endphp
-                                @foreach ($data as $row)
+                                @foreach ($party as $key => $value)
+                                    <?php
                                     
+                                    $sql = DB::table('journal')
+                                        ->select(DB::raw('sum(if(ISNULL(Dr),0,Dr)-if(ISNULL(Cr),0,Cr)) as Balance'))
+                                        ->where('PartyID', request()->PartyID)
+                                        // ->where('PartyID',$value->PartyID)
+                                        ->where('Date', '<', request()->StartDate)
+                                        ->where('ChartOfAccountID', 110400)
+                                        ->get();
+                                    
+                                    $sql[0]->Balance = $sql[0]->Balance == null ? '0' : $sql[0]->Balance;
+                                    
+                                    $party1 = DB::table('journal')
+                                        ->select(DB::raw('sum(Dr) as Dr'), DB::raw('sum(Cr) as Cr'))
+                                        ->whereBetween('date', [request()->StartDate, request()->EndDate])
+                                        ->where('PartyID', request()->PartyID)
+                                        ->where('ChartOfAccountID', 110400)
+                                        ->get();
+                                    
+                                    $DrTotal = $DrTotal + $party1[0]->Dr;
+                                    $CrTotal = $CrTotal + $party1[0]->Cr;
+                                    $OpeningTotal = $OpeningTotal + $sql[0]->Balance;
+                                    
+                                    ?>
+
+
 
 
                                     <tr>
                                         <td>
-                                            <div align="center">{{ $i++ }}.</div>
+                                            <div align="center">{{ $key + 1 }}.</div>
                                         </td>
                                         <td>
-                                            <div align="left">{{ $row['partyId'] }}</div>
+                                            <div align="left">{{ $value->PartyID }}</div>
                                         </td>
-                                        <td>{{ $row['partyName'] }}</td>
+                                        <td>{{ $value->PartyName }}</td>
                                         <td>
-                                            <div align="right">{{ number_format($row['openingBalance'], 2) }}</div>
-                                        </td>
-                                        <td>
-                                            <div align="right">{{ number_format($row['Debit'], 2) }}</div>
+                                            <div align="right">{{ number_format($sql[0]->Balance, 2) }}</div>
                                         </td>
                                         <td>
-                                            <div align="right">{{ number_format($row['Credit'], 2) }}</div>
+                                            <div align="right">{{ number_format($party1[0]->Dr, 2) }}</div>
+                                        </td>
+                                        <td>
+                                            <div align="right">{{ number_format($party1[0]->Cr, 2) }}</div>
                                         </td>
                                         <td>
                                             <div align="right">
-                                                {{ number_format($row['Balance'], 2) }}
+                                                {{ number_format($sql[0]->Balance + $party1[0]->Dr - $party1[0]->Cr, 2) }}
                                             </div>
                                         </td>
 
@@ -118,18 +140,18 @@
                                     </tr>
                                 @endforeach
 
-                                {{-- <tr>
+                                <tr>
                                     <td></td>
                                     <td></td>
                                     <td><strong>TOTAL</strong></td>
-                                    <td align="right"><strong>{{ number_format($totalOB, 2) }}</strong></td>
-                                    <td align="right"><strong>{{ number_format($totalDr, 2) }}</strong></td>
-                                    <td align="right"><strong>{{ number_format($totalCr, 2) }}</strong></td>
+                                    <td align="right"><strong>{{ number_format($OpeningTotal, 2) }}</strong></td>
+                                    <td align="right"><strong>{{ number_format($DrTotal, 2) }}</strong></td>
+                                    <td align="right"><strong>{{ number_format($CrTotal, 2) }}</strong></td>
 
 
                                     <td align="right">
-                                        <strong>{{ number_format($totalBal, 2) }}</strong></td>
-                                </tr> --}}
+                                        <strong>{{ number_format($OpeningTotal + $DrTotal - $CrTotal, 2) }}</strong></td>
+                                </tr>
 
 
 

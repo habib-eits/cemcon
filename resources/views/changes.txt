@@ -1,0 +1,5 @@
+ALTER TABLE `expense_master` ADD `Amount` DECIMAL(15,2) NULL DEFAULT NULL AFTER `ReferenceNo`;
+ALTER TABLE `expense_master` ADD `TaxType` VARCHAR(50) NULL AFTER `Amount`;
+
+ALTER TABLE `expense_detail` ADD `TaxType` VARCHAR(50) NULL AFTER `Notes`;
+ALTER TABLE `expense_detail` ADD `Total` DECIMAL(15,2) NULL AFTER `Amount`;
