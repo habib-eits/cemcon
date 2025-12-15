@@ -16,7 +16,6 @@
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                                     <h4 class="mb-sm-0 font-size-18"> Salary Detail</h4>
-
                                     <div class="page-title-right ">
                                         <div class="page-title-right text-danger">
                                          <!-- button will appear here -->[{{session::get('MonthName')}}]  <a href="{{URL('/SalaryPrint/'.session::get('MonthName').'/'.session::get('BranchID'))}}" target="_blank" class="shadow-sm btn btn-success btn-rounded w-sm"><i class="mdi mdi-printer me-2"></i>Print</a>

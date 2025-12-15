@@ -2649,14 +2649,26 @@ public function issue_letter_delete($id)
           
         }
 
+        $monthName = $request->MonthName;
+        $branchID = $request->BranchID;
+
+
         // $salarysummary = DB::table('salary')->select(DB::raw('sum(Salary) as SumSalary'), DB::raw('sum(Comission) as SumComission'),DB::raw('sum(Grand) as SumGrand'),DB::raw('sum(Bonus) as SumBonus'))->where('MonthName', session::get('MonthName'))->get();
         // $salary = DB::table('salary')->where('MonthName', session::get('MonthName'))->where('BranchID',session::get('BranchID'))->get();
 
-        $salary = DB::table('salary')
-        ->leftJoin('branch','branch.BranchID', '=', 'salary.BranchID')
-        ->where('MonthName', $request->MonthName)
-        ->where('branch.BranchID', $request->BranchID)
-        ->get();
+        if($branchID){
+          $salary = DB::table('salary')
+            ->leftJoin('branch','branch.BranchID', '=', 'salary.BranchID')
+            ->where('salary.MonthName', $monthName)
+            ->where('branch.BranchID', $branchID)
+            ->get();
+        }else{
+            $salary = DB::table('salary')
+            ->leftJoin('branch', 'branch.BranchID', '=' , 'salary.BranchID')
+            ->where('salary.MonthName', $monthName)
+            ->get();
+        }
+       
 
          
         return view('hr.searchsalary',compact('salary','pagetitle'));

@@ -63,8 +63,8 @@
     <div class="col-md-4">
  <div class="mb-3">
     <label for="basicpill-firstname-input">Branch*</label>
-     <select name="BranchID" id="BranchID" class="form-select" required="">
-    <option value="">Select</option>
+     <select name="BranchID" id="BranchID" class="form-select" >
+    <option value="">All Branches</option>
  <?php foreach ($branch as $key => $value): ?>
  	<option value="{{$value->BranchID}}">{{$value->BranchName}}</option>
  <?php endforeach ?>
