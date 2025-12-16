@@ -14,117 +14,99 @@
 </head>
 
 <body>
-    <div class="container mt-5">
-  
+    <div class="container my-4 p-4 border shadow-sm">
+    <!-- Header: Logo + Company Details -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-4 text-center text-md-start">
+            <img src="{{ asset('/documents/' . $company[0]->Logo) }}" alt="Company Logo" class="img-fluid" style="max-width:150px;">
+        </div>
+        <div class="col-md-8 text-center text-md-end">
+            <h3 class="mb-1">{{ $company[0]->Name }}</h3>
+            <div>TRN #: {{ $company[0]->TRN }}</div>
+            <div>{{ $company[0]->Address }}</div>
+            <div>{{ $company[0]->Contact }}</div>
+            <div>{{ $company[0]->Email }}</div>
+        </div>
+    </div>
 
-        <div class="row"  >
-            <div class="col-md-4">
-                <div >
-                    <img width="150px" src="{{asset('/documents/'.$company[0]->Logo)}}" alt="">
+    <hr>
 
-                </div>
+    <!-- Voucher Info -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Expense #: </strong> {{ $expense->ExpenseNo ?? '' }}<br>
+            <strong>Date: </strong> {{ $expense->Date ?? date('Y-m-d') }}<br>
+            <strong>Supplier: </strong> {{ $expense->SupplierName ?? '' }}
+        </div>
+        <div class="col-md-6 text-md-end">
+            <strong>Paid Through: </strong> {{ $expense->ChartOfAccountName ?? '' }}<br>
+            <strong>Reference #: </strong> {{ $expense->ReferenceNo ?? '' }}<br>
+            <strong>Tax Type: </strong> {{ $expense->TaxType ?? 'exclusive' }}
+        </div>
+    </div>
 
-            </div>
-            <div class="col-md-8">
-                <span class="font"><strong>
-                        <h3>{{$company[0]->Name}}</h3>
-                    </strong>
-                    TRN # {{$company[0]->TRN}},<br>
-                    {{$company[0]->Address}}<br>
-                    {{$company[0]->Contact}}<br>
-                    {{$company[0]->Email}}
-
-                </span>
-
-            </div>
-            <div class="col-lg-12">
-                <hr>
-            </div>
-            <div class="mx-auto mt-4" style="width: 50%;">
-
-                <h3 class="font text-uppercase bold font-weight-bold" style="font-size: 22px;">EXPENSE Receipt</h3>
-            </div>
-
-            <div class="container">
-
-                <div class="row">
-                    <div class="col-8">
-                        <table class="table table-borderless">
-
-                            <tbody class="font">
-                                <tr>
-                                    <td>Payment Date</td>
-                                    <th>{{$expense_master[0]->Date	}}</th>
-                                </tr>
-                                <tr>
-                                    <td>Reference Number</td>
-                                    <th>{{$expense_master[0]->ReferenceNo	}}</th>
-                                </tr>  
-
-                                <tr>
-                                    <td>Job No</td>
-                                    <th>{{$expense_master[0]->JobNo   }}</th>
-                                </tr>
-                                <tr>
-                                    <td>Expense No</td>
-                                    <th>{{$expense_master[0]->ExpenseNo	}}</th>
-                                </tr>
-                                
-                            </tbody>
-                        </table>
-                        Bill To:
-                        <br>
-                        <strong style="font-weight: bold;" class="font">{{$expense_master[0]->SupplierName}}</strong>
-                       
-                    </div>
-                    <div class="col-4">
-                        <div class="bg-info text-center pt-4" style="height: 45%; width: 70%; margin-left: -20%;">
-                            <span class="font" style="color: white;">
-                                Amount Paid <br>
-                                {{session::get('Currency')}} {{$expense_master[0]->GrantTotal	}}
-                            </span>
-                        </div>
-
-                    </div>
-                </div>
-                <hr>
-
-                 @if(count($expense_detail)>0)        
-                <table class="table table-sm align-middle table-nowrap mb-0">
-                <tbody><tr class="bg-light">
-                <th scope="col" class="col-md-1">S.No</th>
-                <th scope="col" class="col-md-2">Expense No</th>
-                <th scope="col" class="col-md-3">Description</th>
-                <th scope="col" class="col-md-3">Expense Account</th>
-                <th scope="col" class="col-md-2">Amount</th>
+    <!-- Expense Details Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>Expense Account</th>
+                    <th>Notes</th>
+                    <th>Amount</th>
+                    <th>Tax %</th>
+                    <th>Tax Value</th>
+                    <th>Total</th>
                 </tr>
-                </tbody>
-                <tbody>
-                @foreach ($expense_detail as $key =>$value)
-                 <tr>
-                 <td >{{$key+1}}</td>
-                 <td >{{$value->ExpenseNo}}</td>
-                 <td >{{$value->Notes}}</td>
-                 <td >{{$value->ChartOfAccountName}}</td>
-                 <td >{{$value->Amount}}</td>
-                 </tr>
-                 @endforeach   
-                 <tr class="font-weight-bolder">
-                     <td></td>
-                     <td></td>
-                     <td>Total</td>
-                     <td>{{$expense_master[0]->GrantTotal   }} {{session::get('Currency')}} </td>
-                 </tr>
-                 </tbody>
+            </thead>
+            <tbody>
+                @foreach($expenseDetails as $detail)
+                    <tr>
+                        <td>{{ $detail->ChartOfAccountName ?? '' }}</td>
+                        <td>{{ $detail->Notes }}</td>
+                        <td>{{ number_format($detail->Amount, 2) }}</td>
+                        <td>{{ $detail->TaxPer }}%</td>
+                        <td>{{ number_format($detail->Tax, 2) }}</td>
+                        <td>{{ number_format($detail->Total, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-                 </table>
-                 @else
-                   <p class=" text-danger">No data found</p>
-                 @endif   
+    <!-- Totals -->
+    <div class="row justify-content-end mt-3">
+        <div class="col-md-4">
+            <table class="table table-borderless text-end">
+                <tr>
+                    <th>Total Before VAT:</th>
+                    <td>{{ number_format($expense->Amount, 2) }}</td>
+                </tr>
+                <tr>
+                    <th>Tax Amount:</th>
+                    <td>{{ number_format($expense->Tax, 2) }}</td>
+                </tr>
+                <tr class="fw-bold">
+                    <th>Grand Total:</th>
+                    <td>{{ number_format($expense->GrantTotal, 2) }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
-            </div>
+    <hr>
 
- <hr>
+    <!-- Footer / Signature -->
+    <div class="row mt-5">
+        <div class="col-md-6 text-center">
+            _______________________<br>
+            Prepared By
+        </div>
+        <div class="col-md-6 text-center">
+            _______________________<br>
+            Approved By
+        </div>
+    </div>
+</div>
 
  <div style="height: 250px;">.</div>
 

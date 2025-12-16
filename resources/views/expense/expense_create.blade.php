@@ -3,29 +3,7 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <!-- <script src="{{ asset('assets/invoice/js/jquery-1.11.2.min.js') }}"></script>
-                <script src="{{ asset('assets/invoice/js/jquery-ui.min.js') }}"></script>
-                <script src="js/ajax.js"></script> -->
-    <!--
-                <script src="{{ asset('assets/invoice/js/bootstrap.min.js') }}"></script>
-                <script src="{{ asset('assets/invoice/js/bootstrap-datepicker.js') }}"></script>  -->
-
-
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
-
-    <!-- multipe image upload  -->
-    <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
-    <link href="multiple/dist/imageuploadify.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
-
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
+    
 
     <div class="main-content">
         <div class="page-content">
@@ -44,7 +22,7 @@
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="mb-1 row">
+                                     <div class="mb-1 row">
                                         <div class="col-sm-3">
                                             <label class="col-form-label" for="password">Supplier </label>
                                         </div>
@@ -52,9 +30,9 @@
                                             <select name="SupplierID" id="SupplierID" class="form-select select2 mt-5"
                                                 required="">
                                                 <option value="">Select</option>
-                                                <?php foreach ($supplier as $key => $value) : ?>
-                                                <option value="{{ $value->SupplierID }}">{{ $value->SupplierName }}</option>
-                                                <?php endforeach ?>
+                                                @foreach ($supplier as $key => $value)
+                                                    <option value="{{ $value->SupplierID }}">{{ $value->SupplierName }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -67,25 +45,12 @@
                                         <div class="col-sm-9">
                                             <select name="JobID" id="JobID" class="form-select select2 mt-5">
                                                 <option value="">Select</option>
-                                                <?php foreach ($job as $key => $value) : ?>
-                                                <option value="{{ $value->JobID }}">{{ $value->JobNo }}</option>
-                                                <?php endforeach ?>
+                                                @foreach ($job as $key => $value)
+                                                    <option value="{{ $value->JobID }}">{{ $value->JobNo }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
-
-                                    <div class="mb-1 row d-none" id="WalkinCustomer">
-                                        <div class="col-sm-3">
-                                            <label class="col-form-label text-danger" for="password">or Walkin Customer
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" name="WalkinCustomerName"
-                                                value="" placeholder="Walkin cusomter" id="1WalkinCustomerName">
-
-                                        </div>
-                                    </div>
-
 
 
                                     <div class="mb-1 row">
@@ -94,10 +59,10 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select name="ChartOfAccountID_From" id="ChartOfAccountID_From"
-                                                class="form-select form-control-sm select2   "
+                                                class="form-select form-control-sm select2"
                                                 style="width: 100% !important;" required="">
                                                 <option value="">select</option>
-                                                @foreach ($chartOfAccounts as $key => $value)
+                                                @foreach ($chartOfAccountFrom as $key => $value)
                                                     <option value="{{ $value->ChartOfAccountID }}">
                                                         {{ $value->ChartOfAccountID }}-{{ $value->ChartOfAccountName }}
                                                     </option>
@@ -147,7 +112,7 @@
                                             <div class="col-sm-9">
                                                 <div id="invoict_type"> <input type="text" name="ExpenseNo"
                                                         autocomplete="off" class="form-control"
-                                                        value="EXP-{{ $vhno[0]->VHNO }}" readonly></div>
+                                                        value="{{ $expenseNo }}" readonly></div>
 
 
                                             </div>
@@ -161,21 +126,6 @@
                                             <div class="col-sm-9">
                                                 <input type="date" name="Date" class="form-control"
                                                     value="{{ date('Y-m-d') }}">
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-
-                                    <div class="col-12" id="paymentdetails">
-                                        <div class="mb-1 row">
-                                            <div class="col-sm-3">
-                                                <label class="col-form-label text-danger" for="password">Cheque Details
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input type="text" name="PaymentDetails" class="form-control ">
-
                                             </div>
                                         </div>
                                     </div>
@@ -202,7 +152,7 @@
                                                 <th width="10%">Amount</th>
                                                 <th width="10%">Tax</th>
                                                 <th width="10%">Tax Val</th>
-                                                <th width="15%">TotaL </th>
+                                                <th width="15%">Total </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -217,12 +167,10 @@
                                             class="bx bx-trash align-middle font-medium-3 me-25"></i>Delete</button>
                                     <button class="btn btn-success addmore" id="addRow" type="button"><i
                                             class="bx bx-list-plus align-middle font-medium-3 me-25"></i> Add More</button>
-
                                 </div>
 
-                                <div class='col-xs-5 col-sm-3 col-md-3 col-lg-3  '>
+                                <div class='col-xs-5 col-sm-3 col-md-3 col-lg-3'>
                                     <div id="result"></div>
-
                                 </div>
                                 <br>
 
@@ -234,10 +182,10 @@
 
                                 <div class="col-lg-8 col-12">
 
-
+                                {{-- 
                                     <label for="" class="mt-2">Description</label>
                                     <textarea class="form-control" rows='5' name="DescriptionNotes" id="note"
-                                        placeholder="Description notes if any."></textarea>
+                                        placeholder="Description notes if any."></textarea> --}}
 
                                 </div>
                                 <div class="col-lg-4 col-12 ">
@@ -248,7 +196,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">{{ session::get('Currency') }}</span>
                                             <input type="number" step="0.01" class="form-control" id="TotalBeforeTax"
-                                                name="Amount" readonly />
+                                                name="TotalBeforeTax" readonly />
 
 
                                         </div>
@@ -280,7 +228,7 @@
                             </div>
                             
                             <div class="mt-2"><button type="submit"
-                                    class="btn btn-success w-md float-right">Save</button>
+                                    class="btn btn-success w-md float-right">Update</button>
                                 <a href="{{ URL('/DeliveryChallan') }}"
                                     class="btn btn-secondary w-md float-right">Cancel</a>
 
@@ -313,10 +261,10 @@
                         <td class="p-1"><input class="case" type="checkbox" /></td>
 
                             <td>
-                            <select name="ChartOfAccountID[]" class="form-control coa-select"
+                            <select name="ChartOfAccountID[]" class="form-control coa-select select2"
                                 style="width:100%">
                                 <option value="">select</option>
-                                @foreach ($chartOfAccounts as $row)
+                                @foreach ($expenseAccounts as $row)
                                     <option value="{{ $row->ChartOfAccountID }}">{{ $value->ChartOfAccountID.' - '.$row->ChartOfAccountName }}
                                     </option>
                                 @endforeach
@@ -332,7 +280,7 @@
                         </td>
                         <td>
                             <select name="TaxPer[]" class="form-select row-tax-per-select">
-                                <option value="0">0</option>
+                                <option selected value="0">0</option>
                                 <option value="5">5%</option>
                             </select>
                         </td>
@@ -350,8 +298,8 @@
                 `;
 
                 $("table tbody").append(newRow);
+                $('.select2').select2();
 
-                $("table tbody tr:last").find(".coa-select").select2();
             });
 
         $("#deleteRow").on("click", function() {

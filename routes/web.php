@@ -570,7 +570,7 @@ Route::get('/JobCompletionReport/{jobid}',[JobController::class,'JobCompletionRe
     Route::get('/ExpensePDF/{id}', [Accounts::class, 'ExpensePDF']);
     Route::get('/ExpenseView/{id}', [Accounts::class, 'ExpenseView']);
 
-    Route::post('/ExpenseUpdate', [Accounts::class, 'ExpenseUpdate']);
+    Route::post('/ExpenseUpdate/{id}', [Accounts::class, 'ExpenseUpdate']);
     Route::get('/ExpenseDelete/{id}', [Accounts::class, 'ExpenseDelete']);
 
     Route::get('/TaxReportSupplier/', [Accounts::class, 'TaxReportSupplier']);
