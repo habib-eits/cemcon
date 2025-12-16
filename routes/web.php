@@ -46,6 +46,7 @@ use App\Http\Controllers\EstimateController;
 
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\SubServiceController;
+use App\Http\Controllers\JobWiseProfitLossController;
 
 
 
@@ -294,6 +295,10 @@ Route::group(['middleware' => ['CheckAdmin']], function () {
     Route::get('/ProfitAndLoss/', [Accounts::class, 'ProfitAndLoss']);
     Route::post('/ProfitAndLoss1/', [Accounts::class, 'ProfitAndLoss1']);
     Route::post('/ProfitAndLoss1PDF/', [Accounts::class, 'ProfitAndLoss1PDF']);
+
+    //Job Wise Profit Loss Routes
+    Route::get('/jobwise-profit-loss',[JobWiseProfitLossController::class,'JobwiseProfitLoss'])->name('jobwise_profit_loss');
+    Route::post('/jobwise-profit-loss-report',[JobWiseProfitLossController::class,'JobwiseProfitLossReport'])->name('jobwise_profit_loss_report');
 
 
 

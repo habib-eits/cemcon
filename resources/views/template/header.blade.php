@@ -97,6 +97,7 @@ font-size-16 align-middle me-2"></i>Favorite <i class="mdi mdi-chevron-down"></i
         <a class="dropdown-item" href="{{URL('/TrialBalanceActivity')}}">Trial with acitivity</a>
         <!-- <a class="dropdown-item" href="#">yearly summary</a> -->
         <a class="dropdown-item" href="{{URL('/ProfitAndLoss')}}">profit and loss</a>
+        <a class="dropdown-item" href="{{route('jobwise_profit_loss')}}">Jobwise profit and loss</a>
         <a class="dropdown-item" href="{{URL('/BalanceSheet')}}">balance sheet</a>
         <a class="dropdown-item" href="{{URL('/PartyBalance')}}">party balance</a>
         <!--     <a class="dropdown-item" href="#">ageing report</a>

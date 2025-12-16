@@ -311,6 +311,7 @@
                         </li>
                         <li><a key="t-products" href="#">Yearly Summary</a></li>
                         <li><a key="t-products" href="{{ URL('/ProfitAndLoss') }}">Profit & Loss</a></li>
+                        <li><a key="t-products" href="{{ route('jobwise_profit_loss') }}">Jobwise Profit & Loss</a></li>
                         <li><a key="t-products" href="{{ URL('/BalanceSheet') }}">Balance Sheet</a></li>
                         <li><a key="t-products" href="{{ URL('/PartyBalance') }}">party balance</a></li>
                         <!--   <li><a key="t-products" href="#">ageing report</a></li>
