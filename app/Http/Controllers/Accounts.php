@@ -3387,34 +3387,64 @@ class Accounts extends Controller
 
         return view('partywise_sale', compact('pagetitle', 'invoice_type', 'party','branch'));
     }
-    public function PartyWiseSale1(request $request)
+    // public function PartyWiseSale1(request $request)
+    // {
+    //     ///////////////////////USER RIGHT & CONTROL ///////////////////////////////////////////
+    //     $allow = check_role(session::get('UserID'), 'Party Wise Sale', 'View');
+    //     if ($allow == 0) {
+    //         return redirect()->back()->with('error', 'You access is limited')->with('class', 'danger');
+    //     }
+    //     ////////////////////////////END SCRIPT ////////////////////////////////////////////////
+    //     $pagetitle = 'Party wise sale';
+
+    //     if (($request->PartyID > 0)) {
+
+    //         $party_wise = DB::table('v_partywise_sale')->where('PartyID', $request->PartyID)
+    //             ->whereBetween('date', array($request->StartDate, $request->EndDate))
+    //             ->get();
+    //     } else {
+    //         $party_wise = DB::table('v_partywise_sale')
+    //             ->whereBetween('date', array($request->StartDate, $request->EndDate))
+
+    //             ->get();
+    //     }
+
+    //     //       $pdf = PDF::loadView ('partywise_sale1',compact('party_wise'));
+    //     // //return $pdf->download('pdfview.pdf');
+    //     //   // $pdf->setpaper('A4', 'portiate');
+    //     //       return $pdf->stream();
+    //     return View('partywise_sale1', compact('party_wise', 'pagetitle'));
+    // }
+
+     public function PartyWiseSale1(Request $request)
     {
-        ///////////////////////USER RIGHT & CONTROL ///////////////////////////////////////////
+        // dd($request->all());
+       
         $allow = check_role(session::get('UserID'), 'Party Wise Sale', 'View');
         if ($allow == 0) {
             return redirect()->back()->with('error', 'You access is limited')->with('class', 'danger');
         }
-        ////////////////////////////END SCRIPT ////////////////////////////////////////////////
+
         $pagetitle = 'Party wise sale';
 
-        if (($request->PartyID > 0)) {
+        $startDate = $request->StartDate;
+        $endDate = $request->EndDate;
 
-            $party_wise = DB::table('v_partywise_sale')->where('PartyID', $request->PartyID)
-                ->whereBetween('date', array($request->StartDate, $request->EndDate))
-                ->get();
-        } else {
-            $party_wise = DB::table('v_partywise_sale')
-                ->whereBetween('date', array($request->StartDate, $request->EndDate))
+        $party_wise = DB::table('invoice_master')
+            ->leftJoin('party', 'invoice_master.PartyID', '=', 'party.PartyID')
+            ->when($request->PartyID != null, function ($query) use ($request) {
+                $query->where('invoice_master.PartyID', $request->PartyID);
+            })
+            ->where('invoice_master.InvoiceType', 'Invoice')
+            ->whereBetween('invoice_master.Date', [$startDate, $endDate])
+            ->select('invoice_master.*', 'party.PartyName')
+            ->get();
 
-                ->get();
-        }
+        // return response()->json($party_wise);
 
-        //       $pdf = PDF::loadView ('partywise_sale1',compact('party_wise'));
-        // //return $pdf->download('pdfview.pdf');
-        //   // $pdf->setpaper('A4', 'portiate');
-        //       return $pdf->stream();
         return View('partywise_sale1', compact('party_wise', 'pagetitle'));
     }
+    
     public function PartyWiseSale1PDF(request $request)
     {
 
