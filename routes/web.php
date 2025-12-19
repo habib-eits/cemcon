@@ -40,12 +40,15 @@ use App\Http\Controllers\StatusController;
 use App\Http\Controllers\BookingController;
  use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\HRSetupController;
 use App\Http\Controllers\CampaignController;
+
+
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EstimateController;
-
-
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\SubServiceController;
+use App\Http\Controllers\ProjectProfitLossController;
 
 
 
@@ -296,6 +299,8 @@ Route::group(['middleware' => ['CheckAdmin']], function () {
     Route::post('/ProfitAndLoss1PDF/', [Accounts::class, 'ProfitAndLoss1PDF']);
 
 
+    Route::get('/Project/ProfitAndLoss/', [ProjectProfitLossController::class, 'ProjectProfitAndLoss']);
+    Route::post('/Project/ProfitAndLoss1/', [ProjectProfitLossController::class, 'ProjectProfitAndLoss1']);
 
 
     Route::get('/tmp/', [Accounts::class, 'tmp']);
@@ -648,7 +653,7 @@ Route::get('/JobCompletionReport/{jobid}',[JobController::class,'JobCompletionRe
     Route::get('/Employee',[HR::class,'Employee']);
 Route::get('/ajax_employee',[HR::class,'ajax_employee']);
 Route::get('/HRDashboard',[HR::class,'Dashboard'])->name('kashif');
-Route::get('/EmployeeCreate',[HR::class,'EmployeeCreate']);
+// Route::get('/EmployeeCreate',[HR::class,'EmployeeCreate']);
 Route::post('/EmployeeSave',[HR::class,'EmployeeSave']);
 Route::get('/EmployeeDelete/{id}',[HR::class,'EmployeeDelete']);
 Route::get('/Login',[HR::class,'Login']);
@@ -656,6 +661,11 @@ Route::get('/EmployeeDetail/{id?}',[HR::class,'EmployeeDetail']);
 Route::get('/EmployeeEdit/{id}',[HR::class,'EmployeeEdit']);
 Route::post('/EmployeeUpdate',[HR::class,'EmployeeUpdate']);
 
+Route::get('/employee/create',[EmployeeController::class,'employeeCreate']);
+Route::post('/employee/save',[EmployeeController::class,'employeeSave']);
+Route::get('/employee/edit/{id}',[EmployeeController::class,'employeeEdit']);
+Route::post('/employee/update/{id}', [EmployeeController::class, 'employeeUpdate']);
+Route::post('/employee/delete/{id}',[EmployeeController::class,'employeeDelete']);
 
  route::get('/EmployeeDocuments/',[HR::class,'EmployeeDocuments']);
  route::post('/EmployeeDocumentUpload/',[HR::class,'EmployeeDocumentUpload']);

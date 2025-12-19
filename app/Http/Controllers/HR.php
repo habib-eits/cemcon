@@ -830,6 +830,7 @@ public function EmployeeUpdate(request $request)
         
         
                     }
+                    dd($request->IsSupervisor, $request->JobTitleID);
         
  
          

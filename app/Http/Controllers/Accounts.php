@@ -1619,140 +1619,114 @@ class Accounts extends Controller
     }
 
 
-    public  function ajax_invoice_vhno(request $request)
+    public function ajax_invoice_vhno(Request $request)
     {
+        $branch = DB::table('branch')
+            ->select('BranchCode')
+            ->where('BranchID', $request->BranchID)
+            ->first();
 
-         
-
-        $d = array(
-            'BranchID' => $request->BranchID,
-             'InvoiceType' => $request->InvoiceTyp,
-
-        );
-
-        $branch = DB::table('branch')->select('BranchCode')->where('BranchID',$request->BranchID)->first();
-
-        $data = DB::table('invoice_master')
-                ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))->where('BranchID',$request->BranchID)
-                ->where('InvoiceType',$request->InvoiceTyp)->get();
-
- 
-// $data = DB::select('select LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO  from invoice_master
-// where InvoiceType=".$request->InvoiceTyp." and BranchID=".$request->BranchID."');
-
-
-        
-
-
-
-        // if ($request->InvoiceType == 'Invoice') {
-        //     $d = 'INV';
-
-        //     $data = DB::table('invoice_master')
-        //         ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))->whereIn(DB::raw('left(InvoiceNo,3)'), ['INV'])->get();
-        // } elseif ($request->InvoiceType == 'Tax Invoice') {
-        //     $d = 'TAX';
-
-        //     $data = DB::table('invoice_master')
-        //         ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))->whereIn(DB::raw('left(InvoiceNo,3)'), ['TAX'])->get();
-        // } else {
-        //     $d = 'PRO';
-
-        //     $data = DB::table('invoice_master')
-        //         ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))->where(DB::raw('left(InvoiceNo,3)'), 'PRO')->get();
-        // }
-
-
-
-        if($request->InvoiceTyp=='Job')
-        {
-              $data = DB::table('job')
-                ->select(DB::raw('LPAD(IFNULL(MAX(right(JobNo,5)),0)+1,5,0) as VHNO '))
-                ->where('BranchID',$request->BranchID)
-                ->get();
-       
-
-        $vhno = $branch->BranchCode.'/J0B/'.date('Y').'-'.$data[0]->VHNO;
-
-
-
-        return array('vhno' => $vhno);
-
+        if (!$branch) {
+            return response()->json(['vhno' => null]);
         }
 
-        if($request->InvoiceTyp=='Invoice')
-        {
-              $data = DB::table('invoice_master')
-                ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))
-                ->where('BranchID',$request->BranchID)
-                ->get();
-       
+        if ($request->InvoiceTyp == 'Job') {
 
-        $vhno = $branch->BranchCode.'/INV/'.date('Y').'-'.$data[0]->VHNO;
+            $data = DB::table('job')
+                ->where('JobNo', 'LIKE', '%/' . $branch->BranchCode . '/J0B/' . date('Y') . '-%')
+                ->select(DB::raw("
+                    LPAD(
+                        IFNULL(
+                            MAX(CAST(SUBSTRING_INDEX(JobNo, '-', -1) AS UNSIGNED)),
+                        0) + 1,
+                    5,
+                    '0') AS VHNO
+                "))
+                ->first();
 
+            $vhno = 'CME/' . $branch->BranchCode . '/J0B/' . date('Y') . '-' . $data->VHNO;
 
-
-        return array('vhno' => $vhno);
-
+            return response()->json(['vhno' => $vhno]);
         }
 
-         if($request->InvoiceTyp=='Delivery Note')
-        {
-              $data = DB::table('invoice_master')
-                ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))
-                ->where('BranchID',$request->BranchID)
-                ->get();
-       
+        if ($request->InvoiceTyp == 'Invoice') {
 
-        $vhno = $branch->BranchCode.'/DO/'.date('Y').'-'.$data[0]->VHNO;
+            $data = DB::table('invoice_master')
+                ->where('InvoiceNo', 'LIKE', '%/' . $branch->BranchCode . '/INV/' . date('Y') . '-%')
+                ->select(DB::raw("
+                    LPAD(
+                        IFNULL(
+                            MAX(CAST(SUBSTRING_INDEX(InvoiceNo, '-', -1) AS UNSIGNED)),
+                        0) + 1,
+                    5,
+                    '0') AS VHNO
+                "))
+                ->first();
 
+            $vhno = 'CME/' . $branch->BranchCode . '/INV/' . date('Y') . '-' . $data->VHNO;
 
-
-        return array('vhno' => $vhno);
-
+            return response()->json(['vhno' => $vhno]);
         }
 
+        if ($request->InvoiceTyp == 'Delivery Note') {
 
-    if($request->InvoiceTyp=='PO')
-        {
-              $data = DB::table('invoice_master')
-                ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))
-                ->where('BranchID',$request->BranchID)
-                ->get();
-       
+            $data = DB::table('invoice_master')
+                ->where('InvoiceNo', 'LIKE', '%/' . $branch->BranchCode . '/DO/' . date('Y') . '-%')
+                ->select(DB::raw("
+                    LPAD(
+                        IFNULL(
+                            MAX(CAST(SUBSTRING_INDEX(InvoiceNo, '-', -1) AS UNSIGNED)),
+                        0) + 1,
+                    5,
+                    '0') AS VHNO
+                "))
+                ->first();
 
-        $vhno = $branch->BranchCode.'/PO/'.date('Y').'-'.$data[0]->VHNO;
+            $vhno = 'CME/' . $branch->BranchCode . '/DO/' . date('Y') . '-' . $data->VHNO;
 
-
-
-        return array('vhno' => $vhno);
-
+            return response()->json(['vhno' => $vhno]);
         }
 
+        if ($request->InvoiceTyp == 'PO') {
 
+            $data = DB::table('invoice_master')
+                ->where('InvoiceNo', 'LIKE', '%/' . $branch->BranchCode . '/PO/' . date('Y') . '-%')
+                ->select(DB::raw("
+                    LPAD(
+                        IFNULL(
+                            MAX(CAST(SUBSTRING_INDEX(InvoiceNo, '-', -1) AS UNSIGNED)),
+                        0) + 1,
+                    5,
+                    '0') AS VHNO
+                "))
+                ->first();
 
-        if($request->InvoiceTyp=='PR')
-        {
-              $data = DB::table('invoice_master')
-                ->select(DB::raw('LPAD(IFNULL(MAX(right(InvoiceNo,5)),0)+1,5,0) as VHNO '))
-                ->where('BranchID',$request->BranchID)
-                ->get();
-       
+            $vhno = 'CME/' . $branch->BranchCode . '/PO/' . date('Y') . '-' . $data->VHNO;
 
-        $vhno = $branch->BranchCode.'/PR/'.date('Y').'-'.$data[0]->VHNO;
-
-
-
-        return array('vhno' => $vhno);
-
+            return response()->json(['vhno' => $vhno]);
         }
 
+        if ($request->InvoiceTyp == 'PR') {
 
+            $data = DB::table('invoice_master')
+                ->where('InvoiceNo', 'LIKE', '%/' . $branch->BranchCode . '/PR/' . date('Y') . '-%')
+                ->select(DB::raw("
+                    LPAD(
+                        IFNULL(
+                            MAX(CAST(SUBSTRING_INDEX(InvoiceNo, '-', -1) AS UNSIGNED)),
+                        0) + 1,
+                    5,
+                    '0') AS VHNO
+                "))
+                ->first();
 
+            $vhno = 'CME/' . $branch->BranchCode . '/PR/' . date('Y') . '-' . $data->VHNO;
 
+            return response()->json(['vhno' => $vhno]);
+        }
 
-     }
-
+        return response()->json(['vhno' => null]);
+    }
 
 
 
@@ -2305,7 +2279,6 @@ class Accounts extends Controller
             'Website' => $request->input('Website'),
             'Active' => $request->input('Active'),
             'InvoiceDueDays' => $request->input('InvoiceDueDays'),
-
 
 
         );
@@ -5057,14 +5030,23 @@ class Accounts extends Controller
     }
 
 
-    public  function ProfitAndLoss()
-    {
-        $pagetitle = 'Proft & Loss';
-        return view('profit_loss', compact('pagetitle'));
-    }
+    public function ProfitAndLoss()
+{
+    $pagetitle = 'Proft & Loss';
+
+    // 🔥 Job / Project list
+    $jobs = DB::table('job')
+        ->select('JobID', 'JobNo')
+        ->orderBy('JobNo')
+        ->get();
+
+    return view('profit_loss', compact('pagetitle', 'jobs'));
+}
 
 
-    public  function ProfitAndLoss1(request $request)
+
+
+public  function ProfitAndLoss1(request $request)
     {
         $pagetitle = 'Proft & Loss';
 
@@ -5076,7 +5058,6 @@ class Accounts extends Controller
         //where Date between "'.$request->StartDate.'" and "'.$request->EndDate.'"
         return view('profit_loss11', compact('chartofaccountr', 'chartofaccounte', 'pagetitle'));
     }
-
 
     public function BalanceSheet()
     {

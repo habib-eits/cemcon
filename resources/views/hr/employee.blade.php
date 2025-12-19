@@ -18,7 +18,7 @@
 
      function edit_data(id)
     {
- window.open("{{URL('/EmployeeEdit')}}/"+id,"_self"); 
+ window.open("{{URL('/employee/edit')}}/"+id,"_self"); 
 //alert(id);
     }
 
