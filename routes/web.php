@@ -46,6 +46,7 @@ use App\Http\Controllers\EstimateController;
 
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\SubServiceController;
+use App\Http\Controllers\hr\EmployeeController;
 use App\Http\Controllers\JobWiseProfitLossController;
 
 
@@ -660,6 +661,10 @@ Route::get('/Login',[HR::class,'Login']);
 Route::get('/EmployeeDetail/{id?}',[HR::class,'EmployeeDetail']);
 Route::get('/EmployeeEdit/{id}',[HR::class,'EmployeeEdit']);
 Route::post('/EmployeeUpdate',[HR::class,'EmployeeUpdate']);
+
+//Hamza Employee Routes
+Route::resource('employees',EmployeeController::class);
+Route::get('employee_ajax',[EmployeeController::class,'employee_ajax'])->name('employee.ajax');
 
 
  route::get('/EmployeeDocuments/',[HR::class,'EmployeeDocuments']);
