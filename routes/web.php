@@ -42,8 +42,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\EstimateController;
-
-
+use App\Http\Controllers\JobProfitLossReport;
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\SubServiceController;
 
@@ -852,7 +851,7 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
         
 // END OF CRM LINKS
 
-
+    Route::get('job-profit-loss-report', JobProfitLossReport::class)->name('job-profit-loss-report');
 
 });
 
