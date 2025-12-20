@@ -4019,7 +4019,7 @@ class Accounts extends Controller
 
         return view('tax_overall_report', compact('pagetitle'));
     }
-    public function TaxOverallReport1(request $request)
+     public function TaxOverallReport1(request $request)
     {
         ///////////////////////USER RIGHT & CONTROL ///////////////////////////////////////////
         $allow = check_role(session::get('UserID'), 'Tax Report', 'View');
@@ -4053,9 +4053,18 @@ class Accounts extends Controller
                 ->orderBy('InvoiceMasterID')
                 ->orderBy('Date')
                 ->get();
+
+
+            $expense_vat = DB::table('v_expense_detail')
+            ->whereBetween('Date', array($request->StartDate, $request->EndDate))
+
+                ->where('Tax', '>', 0)
+                ->orderBy('ExpenseMasterID')
+                ->orderBy('Date')
+                ->get();
        
 
-        return View('tax_overall_report1', compact('output_vat','input_vat', 'pagetitle', 'company'));
+        return View('tax_overall_report1', compact('expense_vat','output_vat','input_vat', 'pagetitle', 'company'));
         //return $pdf->download('pdfview.pdf');
         // $pdf->setpaper('A4', 'portiate');
 
