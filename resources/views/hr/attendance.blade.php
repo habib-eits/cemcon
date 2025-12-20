@@ -97,7 +97,7 @@
                                                             {{dateformatman($value->Date)}}
                                                              
                                                          
-                                                        <td class="col-md-1"><a href="{{URL('/AttendanceView/'.$value->Date)}}"><i class="mdi mdi-eye-outline align-middle me-1"></i></a> <a href="{{URL('/AttendanceDelete/'.$value->Date)}}"><i class="bx bx-trash  align-middle me-1"></i></a></td>
+                                                        <td class="col-md-1"><a href="{{URL('AttendanceView/'.$value->Date)}}"><i class="mdi mdi-eye-outline align-middle me-1"></i></a> <a href="{{URL('/AttendanceDelete/'.$value->Date)}}"><i class="bx bx-trash  align-middle me-1"></i></a></td>
                                                         <td>
 
                                                             

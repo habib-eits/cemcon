@@ -47,6 +47,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\SaleOrderController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\SubServiceController;
 use App\Http\Controllers\ProjectProfitLossController;
 
@@ -768,6 +769,8 @@ Route::get('/AttendanceCreate/',[HR::class,'AttendanceCreate']);
 Route::post('/AttendanceSave/',[HR::class,'AttendanceSave']);
 Route::get('/AttendanceDelete/{date}',[HR::class,'AttendanceDelete']);
 Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
+
+Route::get('/attendance/show/{date}',[AttendanceController::class,'show']);
 
 
 // CRM LINKS
