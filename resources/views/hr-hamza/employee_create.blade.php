@@ -26,32 +26,12 @@
                 </div>
                 <!-- end page title -->
 
-                @if (session('error'))
-                    <div class="alert alert-{{ Session::get('class') }} p-3">
-
-                        <strong>{{ Session::get('error') }} </strong>
-                    </div>
-                @endif
-
-                @if (count($errors) > 0)
-
-                    <div>
-                        <div class="alert alert-danger pt-3 pl-0   border-3 bg-danger text-white">
-                            <p class="font-weight-bold"> There were some problems with your input.</p>
-                            <ul>
-
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-
-                @endif
-
-                <form action="{{ route('employees.store') }}" method="post" enctype="multipart/form-data">
+                <!-- Dynamic Alert Area (AJAX will insert here) -->
+                <div id="alertContainer"></div>
+                <form id="employeeForm" action="{{ route('employees.store') }}" method="post" enctype="multipart/form-data"
+                    novalidate>
                     <div class="row">
-                        {{ csrf_field() }}
+                        @csrf
                         <div>
                             <div class="card shadow-sm">
                                 <div class="card-header bg-transparent border-bottom h5">
@@ -63,8 +43,8 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="mb-3"><label for="basicpill-firstname-input" class="pr-5">Staff
-                                                    Picture</label><br><input type="file" name="UploadSlip"
-                                                    id="UploadSlip">
+                                                    Picture</label><br><input type="file" name="employee_photo"
+                                                    id="employee_photo">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -106,7 +86,7 @@
                                             <div class="mb-3">
                                                 <label for="basicpill-firstname-input">Staff Type <span
                                                         class="text-danger">*</span></label>
-                                                <select name="StaffType" id="StaffType" class="form-select">
+                                                <select name="StaffType" id="StaffType" class="form-select" required>
                                                     @foreach ($staff_type as $value)
                                                         <option value="{{ $value->StaffType }}"
                                                             {{ old('StaffType') == $value->StaffType ? 'selected=selected' : '' }}>
@@ -182,7 +162,6 @@
                                                     value="{{ old('Email') }} ">
                                             </div>
 
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -204,8 +183,6 @@
                                                 <input type="text" class="form-control" name="MobileNo"
                                                     value="{{ old('MobileNo') }} ">
                                             </div>
-
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -224,8 +201,6 @@
                                                 <input type="text" class="form-control" name="FullAddress"
                                                     value="{{ old('FullAddress') }} ">
                                             </div>
-
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -249,8 +224,6 @@
                                                 <input type="text" class="form-control" name="LastDegree"
                                                     value="{{ old('LastDegree') }} ">
                                             </div>
-
-
                                         </div>
                                     </div>
                                     <!-- end of personal detail row -->
@@ -287,8 +260,6 @@
 
                                         <div class="clearfix"></div>
 
-
-
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="basicpill-firstname-input">Spouse Name</label>
@@ -316,9 +287,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
 
                             <div class="card shadow-sm">
                                 <div class="card-header bg-transparent border-bottom h5">
@@ -487,15 +455,12 @@
                                         </div>
 
                                         <div class="clearfix"></div>
-
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="basicpill-firstname-input">Work Location </label>
                                                 <input type="text" class="form-control" name="WorkLocation"
                                                     value="{{ old('WorkLocation') }} ">
                                             </div>
-
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -504,8 +469,6 @@
                                                 <input type="text" class="form-control" name="EmailOffical"
                                                     value="{{ old('EmailOffical') }} ">
                                             </div>
-
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -514,8 +477,6 @@
                                                 <input type="text" class="form-control" name="WorkPhone"
                                                     value="{{ old('WorkPhone') }} ">
                                             </div>
-
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -527,7 +488,6 @@
                                                     data-inputmask-inputformat="dd/mm/yyyy"
                                                     value="{{ old('StartDate') }}" im-insert="false">
                                             </div>
-
                                         </div>
 
                                         <div class="col-md-4">
@@ -559,7 +519,6 @@
                             </div>
 
                             <!-- end card -->
-
                             <div class="card shadow-sm">
                                 <div class="card-header bg-transparent border-bottom h5">
                                     Bank Details
@@ -580,10 +539,7 @@
                                                 <input type="text" class="form-control" name="IBAN"
                                                     value="{{ old('IBAN') }} ">
                                             </div>
-
-
                                         </div>
-
 
                                         <div class="col-md-4">
                                             <div class="mb-3">
@@ -591,50 +547,128 @@
                                                 <input type="text" class="form-control" name="AccounTitle"
                                                     value="{{ old('AccounTitle') }} ">
                                             </div>
-
-
                                         </div>
-
 
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="basicpill-firstname-input">Salary Type </label>
                                                 <select name="SalaryTypeID" class="form-select">
-
-
                                                     @foreach ($salary_type as $value)
                                                         <option value="{{ $value->SalaryTypeID }}">
                                                             {{ $value->SalaryType }}</option>
                                                     @endforeach
-
-
                                                 </select>
                                             </div>
-
-
                                         </div>
+                                    </div>
 
+                                    <div class="text-end mt-4">
+                                        <button type="submit" id="saveBtn" class="btn btn-success w-md">
+                                            <span class="spinner-border spinner-border-sm d-none" role="status"
+                                                aria-hidden="true"></span>
+                                            Save
+                                        </button>
+                                        <button type="button" onclick="history.back()"
+                                            class="btn btn-secondary w-md ms-2">
+                                            Cancel
+                                        </button>
                                     </div>
-                                    <div><button type="submit" class="btn btn-success w-md float-right">Save </button>
-                                        <a href="#" onclick="history.back()"
-                                            class="btn btn-secondary w-md float-right">Cancel</a>
-                                    </div>
+
                                 </div>
-
-
                             </div>
-
-
                         </div>
                         <!-- end col -->
-
-
                     </div>
                     <!-- end row -->
-
                 </form>
             </div> <!-- container-fluid -->
         </div>
-    @endsection
 
-    redirect:
+        <!-- AJAX Script -->
+        <script>
+            $(document).ready(function() {
+                $('#employeeForm').on('submit', function(e) {
+                    e.preventDefault();
+
+                    // Reset previous errors
+                    $('.form-control, .form-select').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                    $('#alertContainer').empty();
+
+                    // Button loading state
+                    let $btn = $('#saveBtn');
+                    $btn.prop('disabled', true);
+                    $btn.find('.spinner-border').removeClass('d-none');
+                    $btn.html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+
+                    let formData = new FormData(this);
+
+                    $.ajax({
+                        url: '{{ route('employees.store') }}',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function() {
+                            window.location.href = '{{ route('employees.index') }}';
+                        },
+                        error: function(xhr) {
+                            $btn.prop('disabled', false);
+                            $btn.find('.spinner-border').addClass('d-none');
+                            $btn.html('Save');
+
+                            if (xhr.status === 422) {
+                                let errors = xhr.responseJSON.errors;
+                                let alertHtml = `
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Please fix the following errors:</strong>
+                            <ul class="mt-2 mb-0">
+                    `;
+
+                                Object.keys(errors).forEach(function(field) {
+                                    let message = errors[field][0];
+                                    alertHtml += `<li>${message}</li>`;
+
+                                    // Find the input/select/radio
+                                    let $field = $(
+                                        `[name="${field}"], [name="${field}[]"]`);
+
+                                    // Add red border
+                                    $field.addClass('is-invalid');
+
+                                    // Remove old feedback
+                                    $field.closest('.mb-3').find('.invalid-feedback')
+                                        .remove();
+
+                                    // Add new feedback below field
+                                    $field.closest('.mb-3').append(
+                                        `<div class="invalid-feedback">${message}</div>`
+                                    );
+                                });
+
+                                alertHtml += `
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+
+                                $('#alertContainer').html(alertHtml);
+
+                                // Scroll to top alert
+                                $('html, body').animate({
+                                    scrollTop: $("#alertContainer").offset().top - 100
+                                }, 500);
+                            } else {
+                                $('#alertContainer').html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Server error. Please try again.</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+    @endsection

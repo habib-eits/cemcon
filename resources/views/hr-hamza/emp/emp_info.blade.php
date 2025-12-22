@@ -1,45 +1,45 @@
-  <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="media">
-                                            <div class="me-3">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="media align-items-center">
+                    <div class="me-3">
+                        @if ($employee->Picture)
+                            <img src="{{ asset('emp-picture/' . $employee->Picture) }}" alt="Employee Photo"
+                                class="avatar-md rounded">
+                        @else
+                            <img src="{{ asset('assets/images/users/avatar.png') }}" alt="Default Avatar"
+                                class="avatar-md rounded">
+                        @endif
+                    </div>
 
-                                              <?php if($employee[0]->Picture!=null){ ?>
-                                                <img src="{{URL('/emp-picture/'.$employee[0]->Picture)}}" alt="" class="avatar-md rounded  ">  
-                                              <?php } 
-                                              else
-                                              {
-
-
-                                              ?>
-
-                                                <img src="{{ asset('assets/images/users/avatar.png')}}" alt="" class="avatar-md rounded  ">
-
-                                            <?php } ?>
-
-                                            </div>
-                                            <div class="media-body align-self-center">
-                                                <div class="text-muted">
-                                                    <h5>{{$employee[0]->Title}} {{$employee[0]->FullName}} {{$employee[0]->MiddleName}} {{$employee[0]->LastName}}</h5>
-                                                    <p class="mb-1">{{$employee[0]->JobTitleName}} , {{$employee[0]->DepartmentName}},  <span class="badge badge-soft-success font-size-11 me-2 ml-5"> {{$employee[0]->StaffType}}  </span> </p>
-                                                    <p class="mb-0">{{$employee[0]->BranchName}}</p>
-                                                     
-                                                </div>
-                                            </div>
-                                    
-
-                                                        <div class="dropdown ms-2">
-                                                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <i class="bx bxs-cog align-middle me-1"></i> Manage
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-end" style="margin: 0px;">
-                                                            <a class="dropdown-item" href="{{URL('/EmployeeEdit/'.$employee[0]->EmployeeID)}}"><i class="mdi mdi-pencil text-secondary font-size-16 me-2"></i>Edit</a>
-                                                            <a class="dropdown-item" href="#"> <i class="mdi mdi-trash-can text-secondary font-size-16 me-2"></i>Delete</a>
-                                                         </div>
-                                                    </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="media-body align-self-center">
+                        <div class="text-muted">
+                            <h5 class="mb-1">
+                                {{ $employee->Title }} {{ $employee->FirstName }}
+                                {{ $employee->MiddleName ? $employee->MiddleName : '' }}
+                                {{ $employee->LastName }}
+                            </h5>
+                            <p class="mb-1">
+                                {{ $employee->JobTitleName }} ,
+                                {{ $employee->DepartmentName }}
+                                <span class="badge badge-soft-success font-size-11 ms-2">
+                                    {{ $employee->StaffType }}
+                                </span>
+                            </p>
+                            <p class="mb-0">{{ $employee->BranchName }}</p>
                         </div>
+                    </div>
+
+                    <!-- Direct Edit Button/Icon -->
+                    <div class="ms-auto">
+                        <a href="{{ route('employees.edit', $employee->EmployeeID) }}"
+                            class="btn btn-sm btn-outline-primary" title="Edit Employee">
+                            <i class="mdi mdi-pencil font-size-18"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

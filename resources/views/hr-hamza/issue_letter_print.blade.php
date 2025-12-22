@@ -1,1 +1,1 @@
- <?php echo $issue_letter[0]->Content; ?>
+ <?php echo $issue_letter->Content; ?>

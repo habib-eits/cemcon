@@ -10,7 +10,7 @@
 
                     <div class="col-12">
                         <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                            <h4 class="mb-sm-0 font-size-18">Emplyee Edit</h4>
+                            <h4 class="mb-sm-0 font-size-18">Employee Edit</h4>
 
                             <div class="page-title-right">
                                 <div class="page-title-right">
@@ -26,29 +26,10 @@
                 </div>
                 <!-- end page title -->
 
-                @if (session('error'))
-                    <div class="alert alert-{{ Session::get('class') }} p-3">
-
-                        <strong>{{ Session::get('error') }} </strong>
-                    </div>
-                @endif
-
-                @if (count($errors) > 0)
-
-                    <div>
-                        <div class="alert alert-danger pt-3 pl-0   border-3 bg-danger text-white">
-                            <p class="font-weight-bold"> There were some problems with your input.</p>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                @endif
-
-                <form action="{{ route('employees.update', $employee->EmployeeID) }}" method="post"
-                    enctype="multipart/form-data">
+                <!-- Dynamic Alert Area (AJAX will insert here) -->
+                <div id="alertContainer"></div>
+                <form id="employeeForm" action="{{ route('employees.update', $employee->EmployeeID) }}" method="POST"
+                    enctype="multipart/form-data" novalidate>
                     <div class="row">
 
                         @csrf
@@ -64,8 +45,8 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="mb-3"><label for="basicpill-firstname-input" class="pr-5">Upload
-                                                    Staff Picture</label><br><input type="file" name="UploadSlip"
-                                                    id="UploadSlip"></div>
+                                                    Staff Picture</label><br><input type="file" name="employee_photo"
+                                                    id=""></div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
@@ -364,7 +345,7 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="basicpill-firstname-input">Passport Expiry*</label>
-                                                <input date name="PassportExpiry" id="input-date1"
+                                                <input type="date" name="PassportExpiry" id="input-date1"
                                                     class="form-control input-mask" data-inputmask="'alias': 'datetime'"
                                                     data-inputmask-inputformat="dd/mm/yyyy"
                                                     value="{{ $employee->PassportExpiry ? \Carbon\Carbon::parse($employee->PassportExpiry)->format('Y-m-d') : '' }}"
@@ -596,10 +577,16 @@
                                             </div>
                                         </div>
 
-                                        <div><button type="submit" class="btn btn-success w-lg float-right">Save /
-                                                Update</button>
-                                            <a href="{{ URL('/EmployeeDetail') }}"
-                                                class="btn btn-secondary w-lg float-right">Cancel</a>
+                                        <div class="text-end mt-4">
+                                            <button type="submit" id="updateBtn" class="btn btn-success w-md">
+                                                <span class="spinner-border spinner-border-sm d-none" role="status"
+                                                    aria-hidden="true"></span>
+                                                Update
+                                            </button>
+                                            <button type="button" onclick="history.back()"
+                                                class="btn btn-secondary w-md ms-2">
+                                                Cancel
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -611,4 +598,84 @@
                 </form>
             </div> <!-- container-fluid -->
         </div>
+
+        <!-- AJAX Script -->
+        <script>
+            $(document).ready(function() {
+                $('#employeeForm').on('submit', function(e) {
+                    e.preventDefault();
+
+                    $('.form-control, .form-select').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                    $('#alertContainer').empty();
+
+                    let $btn = $('#updateBtn');
+                    $btn.prop('disabled', true);
+                    $btn.find('.spinner-border').removeClass('d-none');
+                    $btn.html('<span class="spinner-border spinner-border-sm"></span> Updating...');
+
+                    let formData = new FormData(this);
+
+                    $.ajax({
+                        url: '{{ route('employees.update', $employee->EmployeeID) }}',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-HTTP-Method-Override': 'PUT'
+                        },
+                        success: function() {
+                            window.location.href = '{{ route('employees.index') }}';
+                        },
+                        error: function(xhr) {
+                            $btn.prop('disabled', false);
+                            $btn.find('.spinner-border').addClass('d-none');
+                            $btn.html('Update Employee');
+
+                            if (xhr.status === 422) {
+                                let errors = xhr.responseJSON.errors;
+                                let alertHtml = `
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Please fix the following errors:</strong>
+                            <ul class="mt-2 mb-0">
+                    `;
+
+                                Object.keys(errors).forEach(function(field) {
+                                    let message = errors[field][0];
+                                    alertHtml += `<li>${message}</li>`;
+
+                                    let $field = $(
+                                        `[name="${field}"], [name="${field}[]"]`);
+                                    $field.addClass('is-invalid');
+                                    $field.closest('.mb-3').find('.invalid-feedback')
+                                        .remove();
+                                    $field.closest('.mb-3').append(
+                                        `<div class="invalid-feedback">${message}</div>`
+                                    );
+                                });
+
+                                alertHtml += `
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+
+                                $('#alertContainer').html(alertHtml);
+                                $('html, body').animate({
+                                    scrollTop: $("#alertContainer").offset().top - 100
+                                }, 500);
+                            } else {
+                                $('#alertContainer').html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Server error. Please try again.</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
     @endsection

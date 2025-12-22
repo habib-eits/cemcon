@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\hr;
+namespace App\Http\Controllers\Hr;
 
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
+use App\Services\EmployeeService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Yajra\DataTables\DataTables;
+use App\Http\Requests\EmployeeRequest;
 
 class EmployeeController extends Controller
 {
@@ -103,109 +105,24 @@ class EmployeeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(EmployeeRequest $request, EmployeeService $employeeService)
     {
-        /* ================= USER RIGHTS ================= */
         if (!check_hr_role(session('UserID'), session('BranchID'), 'Employee', 'Create')) {
             return redirect()->back()
                 ->with('error', 'Your access is limited')
                 ->with('class', 'danger');
         }
 
-        /* ================= VALIDATION ================= */
-        $request->validate([
-            'BranchID'  => 'required',
-            'FirstName' => 'required',
-            'DateOfBirth' => 'required|date',
-            'IsSupervisor' => 'required|in:Yes,No',
-            'StaffType' => 'required',
-            'Email' => 'required|email',
-            'StartDate' => 'required|date',
-            'UploadSlip' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
-        ], [
-            'BranchID.required'  => 'Branch is required',
-            'FirstName.required' => 'First Name is required',
-        ]);
+        $picture = $employeeService->handleUpload($request);
 
-        /* ================= FILE UPLOAD ================= */
-        $filename = null;
-        if ($request->file('UploadSlip') != null) {
-            $this->validate($request, [
-                'UploadSlip' => 'required|image|mimes:jpeg,png,jpg,gif|max:20000',
-            ]);
+        $data = $employeeService->prepareData($request->validated(), $picture);
 
-            $file = $request->file('UploadSlip');
-            $filename = time() . '.' . $file->extension();
-            $destinationPath = public_path('/emp-picture');
-            $file->move($destinationPath, $filename);
-        }
-
-        /* ================= DATA PREPARATION ================= */
-        $data = [
-            'BranchID'              => $request->BranchID,
-            'Title'                 => $request->Title,
-            'IsSupervisor'          => $request->IsSupervisor,
-            'FirstName'             => $request->FirstName,
-            'MiddleName'            => $request->MiddleName,
-            'LastName'              => $request->LastName,
-            'DateOfBirth'           => $this->formatDate($request->DateOfBirth),
-            'Gender'                => $request->Gender,
-            'Email'                 => $request->Email,
-            'Nationality'           => $request->Nationality,
-            'MobileNo'              => $request->MobileNo,
-            'HomePhone'             => $request->HomePhone,
-            'FullAddress'           => $request->FullAddress,
-            'EducationLevel'        => $request->EducationLevel,
-            'LastDegree'            => $request->LastDegree,
-            'MaritalStatus'         => $request->MaritalStatus,
-            'SSNorGID'              => $request->SSNorGID,
-            'SpouseName'            => $request->SpouseName,
-            'SpouseEmployer'        => $request->SpouseEmployer,
-            'SpouseWorkPhone'       => $request->SpouseWorkPhone,
-            'VisaIssueDate'         => $this->formatDate($request->VisaIssueDate),
-            'VisaExpiryDate'        => $this->formatDate($request->VisaExpiryDate),
-            'PassportNo'            => $request->PassportNo,
-            'PassportExpiry'        => $this->formatDate($request->PassportExpiry),
-            'EidNo'                 => $request->EidNo,
-            'EidExpiry'             => $this->formatDate($request->EidExpiry),
-            'NextofKinName'         => $request->NextofKinName,
-            'NextofKinAddress'      => $request->NextofKinAddress,
-            'NextofKinPhone'        => $request->NextofKinPhone,
-            'NextofKinRelationship' => $request->NextofKinRelationship,
-            'JobTitleID'            => $request->JobTitleID,
-            'DepartmentID'          => $request->DepartmentID,
-            'SupervisorID'          => $request->SupervisorID,
-            'WorkLocation'          => $request->WorkLocation,
-            'EmailOffical'          => $request->EmailOffical,
-            'WorkPhone'             => $request->WorkPhone,
-            'StartDate'             => $this->formatDate($request->StartDate),
-            'Salary'                => $request->Salary,
-            'ExtraComission'        => $request->ExtraComission,
-            'SalaryRemarks'         => $request->SalaryRemarks,
-            'StaffType'             => $request->StaffType,
-            'SalaryTypeID'          => $request->SalaryTypeID,
-            'BankName'              => $request->BankName,
-            'IBAN'                  => $request->IBAN,
-            'AccountTitle'          => $request->AccountTitle,
-            'Picture'               => $filename,
-        ];
-
-        /* ================= INSERT ================= */
-        DB::table('employee')->insert($data);
+        $employeeService->create($data);
 
         return redirect('employees')
             ->with('error', 'Employee Record Saved Successfully')
             ->with('class', 'success');
     }
-
-
-    /* ================= DATE FORMAT HELPER ================= */
-    private function formatDate($date)
-    {
-        return $date ? date('Y-m-d', strtotime(str_replace('/', '-', $date))) : null;
-    }
-
-
 
     /**
      * Display the specified resource.
@@ -215,7 +132,34 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        //
+        if (!check_hr_role(session('UserID'), session('BranchID'), 'Employee', 'Detail')) {
+            return redirect('Dashboard')
+                ->with('error', 'Your access is limited')
+                ->with('class', 'danger');
+        }
+
+        $employee = DB::table('v_employee')
+            ->where('EmployeeID', $id)
+            ->first();
+
+        if (!$employee) {
+            return redirect('employees')
+                ->with('error', 'Employee not found')
+                ->with('class', 'warning');
+        }
+
+        $startDate = $employee->StartDate ?? '1970-01-01';
+        $from = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
+        $to = \Carbon\Carbon::today();
+        $diffInMonths = $to->diffInMonths($from);
+
+        session([
+            'EmployeeID' => $id,
+            'StartDate'  => $employee->StartDate,
+            'Months'     => $diffInMonths,
+        ]);
+
+        return view('hr-hamza.employee_detail', compact('employee', 'diffInMonths'));
     }
 
     /**
@@ -276,106 +220,31 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EmployeeRequest $request, $id, EmployeeService $employeeService)
     {
-        // dd($request->all());
-        // ================= USER RIGHTS =================
         if (!check_hr_role(session('UserID'), session('BranchID'), 'Employee', 'Update')) {
             return redirect()->back()
                 ->with('error', 'Your access is limited')
                 ->with('class', 'danger');
         }
 
-        // ================= VALIDATION =================
-        $request->validate([
-            'BranchID'  => 'required',
-            'FirstName' => 'required',
-            'DateOfBirth' => 'required|date',
-            'IsSupervisor' => 'required|in:Yes,No',
-            'StaffType' => 'required',
-            'Email' => 'required|email',
-            'StartDate' => 'required|date',
-            'UploadSlip' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20000',
-        ], [
-            'BranchID.required'  => 'Branch is required',
-            'FirstName.required' => 'First Name is required',
-        ]);
-
-        // ================= FETCH EMPLOYEE =================
-        $employee = DB::table('employee')->where('EmployeeID', $id)->first();
+        $employee = $employeeService->find($id);
         if (!$employee) {
             return redirect()->route('employees.index')
                 ->with('error', 'Employee not found')
                 ->with('class', 'warning');
         }
 
-        // ================= FILE UPLOAD =================
-        $filename = $employee->Picture; // keep old picture if no new upload
-        if ($request->hasFile('UploadSlip')) {
-            $file = $request->file('UploadSlip');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('emp-picture'), $filename);
-        }
+        $picture = $employeeService->handleUpload($request) ?? $employee->Picture;
 
-        // ================= DATA PREPARATION =================
-        $data = [
-            'BranchID'              => $request->BranchID,
-            'Title'                 => $request->Title,
-            'IsSupervisor'          => $request->IsSupervisor,
-            'FirstName'             => $request->FirstName,
-            'MiddleName'            => $request->MiddleName,
-            'LastName'              => $request->LastName,
-            'DateOfBirth'           => $this->formatDate($request->DateOfBirth),
-            'Gender'                => $request->Gender,
-            'Email'                 => $request->Email,
-            'Nationality'           => $request->Nationality,
-            'MobileNo'              => $request->MobileNo,
-            'HomePhone'             => $request->HomePhone,
-            'FullAddress'           => $request->FullAddress,
-            'EducationLevel'        => $request->EducationLevel,
-            'LastDegree'            => $request->LastDegree,
-            'MaritalStatus'         => $request->MaritalStatus,
-            'SSNorGID'              => $request->SSNorGID,
-            'SpouseName'            => $request->SpouseName,
-            'SpouseEmployer'        => $request->SpouseEmployer,
-            'SpouseWorkPhone'       => $request->SpouseWorkPhone,
-            'VisaIssueDate'         => $this->formatDate($request->VisaIssueDate),
-            'VisaExpiryDate'        => $this->formatDate($request->VisaExpiryDate),
-            'PassportNo'            => $request->PassportNo,
-            'PassportExpiry'        => $this->formatDate($request->PassportExpiry),
-            'EidNo'                 => $request->EidNo,
-            'EidExpiry'             => $this->formatDate($request->EidExpiry),
-            'NextofKinName'         => $request->NextofKinName,
-            'NextofKinAddress'      => $request->NextofKinAddress,
-            'NextofKinPhone'        => $request->NextofKinPhone,
-            'NextofKinRelationship' => $request->NextofKinRelationship,
-            'JobTitleID'            => $request->JobTitleID,
-            'DepartmentID'          => $request->DepartmentID,
-            'SupervisorID'          => $request->SupervisorID,
-            'WorkLocation'          => $request->WorkLocation,
-            'EmailOffical'          => $request->EmailOffical,
-            'WorkPhone'             => $request->WorkPhone,
-            'StartDate'             => $this->formatDate($request->StartDate),
-            'Salary'                => $request->Salary,
-            'ExtraComission'        => $request->ExtraComission,
-            'SalaryRemarks'         => $request->SalaryRemarks,
-            'StaffType'             => $request->StaffType,
-            'SalaryTypeID'          => $request->SalaryTypeID,
-            'BankName'              => $request->BankName,
-            'IBAN'                  => $request->IBAN,
-            'AccountTitle'          => $request->AccountTitle,
-            'Picture'               => $filename,
-        ];
+        $data = $employeeService->prepareData($request->validated(), $picture);
 
-        // ================= UPDATE =================
-        DB::table('employee')->where('EmployeeID', $id)->update($data);
+        $employeeService->update($id, $data);
 
-        // return redirect('EmployeeDetail/' . $id)
         return redirect('employees')
             ->with('error', 'Employee Record Updated Successfully')
             ->with('class', 'success');
     }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -384,7 +253,6 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        // dd($id);
         if (!check_hr_role(session('UserID'), session('BranchID'), 'Employee', 'Delete')) {
             return redirect('Dashboard')
                 ->with('error', 'Your access is limited')

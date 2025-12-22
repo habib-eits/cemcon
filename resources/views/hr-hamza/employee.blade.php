@@ -175,5 +175,13 @@
             }
         </script>
 
+        <script>
+            function view_data(id) {
+                window.location.href = "{{ route('employees.show', '') }}/" + id;
+                // Or even cleaner (recommended):
+                // window.location.href = `/employees/${id}`;
+            }
+        </script>
+
 
     @endsection
