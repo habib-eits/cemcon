@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AjaxController;
-
+use App\Http\Controllers\AttendanceController;
 //HR
 use App\Http\Controllers\ChartOfAccount;
 use App\Http\Controllers\LeadController;
@@ -41,6 +41,8 @@ use App\Http\Controllers\BookingController;
  use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeDetailController;
 use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\JobProfitLossReport;
 use App\Http\Controllers\SaleOrderController;
@@ -852,6 +854,15 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
 // END OF CRM LINKS
 
     Route::get('job-profit-loss-report', JobProfitLossReport::class)->name('job-profit-loss-report');
+    Route::resource('employees', EmployeeController::class);
+    
+    Route::get('salary-detail/{employee_id}', [EmployeeDetailController::class , 'salaryDetail'])->name('employee.salary-detail');
+
+
+    Route::resource('attendances', AttendanceController::class);
+
+
+
 
 });
 

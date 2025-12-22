@@ -6,3 +6,5 @@ ALTER TABLE `expense_detail` ADD `Total` DECIMAL(15,2) NULL AFTER `Amount`;
 
 
 add input tax in chart of accounts and update config
+
+delete all migrations then run attendance

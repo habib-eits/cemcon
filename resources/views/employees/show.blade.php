@@ -59,12 +59,10 @@
 
                         @include('hr.emp.emp_info')
 
-
-                        <form action="{{ URL('/EmployeeUpdate') }}" method="post" enctype="multipart/form-data">
+                            
+                        <form>
                             <div class="row">
 
-                                {{ csrf_field() }}
-                                <input type="hidden" name="EmployeeID" value="27" readonly="">
 
                                 <div>
                                     <div class="card">

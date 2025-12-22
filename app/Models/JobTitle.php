@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Branch extends Model
+class JobTitle extends Model
 {
     use HasFactory;
-    protected $guarded = [];
 
-    protected $table = 'branch';
-    public $primaryKey = 'BranchID';
+
+    protected $table = 'jobtitle';
+    public $primaryKey = 'JobTitleID';
 }
