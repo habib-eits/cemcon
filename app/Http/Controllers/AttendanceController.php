@@ -59,6 +59,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'date' => 'required',
             'branch_id' => 'required',
+            'office_hours' => 'required|numeric',
         ]);
 
         $is_exists = Attendance::where([
@@ -77,8 +78,7 @@ class AttendanceController extends Controller
 
         $attendance =  Attendance::create($validated);
 
-        return redirect()->back()->with('success', 'Attendance created successfully.');
-
+        return redirect()->route('attendances.edit',$attendance->id);
         
         
     }
@@ -102,7 +102,27 @@ class AttendanceController extends Controller
      */
     public function edit($id)
     {
-        
+        $attendance = Attendance::find($id);
+
+
+        $employees =  Employee::with([
+            'jobTitle',
+            'supervisor',
+            'department',
+            ])
+            ->where('StaffType', '<>', 'Inactive')
+            ->where('BranchID', $attendance->branch_id)
+            ->orderBy('EmployeeID');
+            
+        return view('attendances.edit', [
+            'attendance' =>  $attendance,
+            'branches' =>  DB::table('branch')->get(),
+            'jobs' =>  DB::table('job')->get(),
+            'fixed' => $employees->where('SalaryTypeID', 1)->get(),
+            'fixed_ot' => $employees->where('SalaryTypeID', 2)->get(),
+            'hourly' => $employees->where('SalaryTypeID', 3)->get(),
+            'perday' => $employees->where('SalaryTypeID', 4)->get(),
+        ]);
     }
 
     /**

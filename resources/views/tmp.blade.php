@@ -39,7 +39,25 @@
     width: 29px;
 }
 </style>
+<style>
+    /* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none; /* Removes the button entirely in WebKit browsers */
+  margin: 0; /* Ensures no extra margin remains */
+}
 
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield; /* Hides the spinner in Firefox */
+  appearance: textfield; /* Standard property for newer Firefox versions */
+}
+
+/* General standard (optional, but good practice) */
+input[type=number] {
+  appearance: none;
+}
+</style>
 </head>
 
 <body data-sidebar="dark">

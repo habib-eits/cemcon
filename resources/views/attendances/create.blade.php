@@ -46,6 +46,14 @@
                                 </div>
                             </div>
                            
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="basicpill-firstname-input">Office Hours  <span
+                                        class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="office_hours" value="{{ old('office_hours',8) }}">
+                                </div>
+                            </div>
+                           
 
                             <button type="submit" class="btn btn-success">Submit</button>
 
@@ -53,45 +61,7 @@
                         </form>
                     </div>
 
-                    <table class="table table-bordered table-sm table-striped mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th>S#</th>
-                        <th>Employee</th>
-                        <th>Designation</th>
-                        <th>Project</th>
-                        <th>Attendance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($fixed as $row)
-                        <tr>
-                            <td>
-                                {{ $row->EmployeeID }}
-                                <input type="hidden" name="EmployeeID[]" value="{{ $row->EmployeeID }}">
-                            </td>
-                            <td>{{ $row->FirstName .' - '. $row->lastName}}</td>
-                            <td>{{ $row->jobTitle->JobTitleName ?? 'N/A' }}</td>
-                            <td>
-                                <select name="JobID[]" class="form-select form-select-sm">
-                                    @foreach ($jobs as $j)
-                                        <option value="{{ $j->JobID }}">{{ $j->JobNo }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select name="Attendance[]" class="form-select form-select-sm"
-                                    style="width: 80px;">
-                                    <option value="1">P</option>
-                                    <option value="0">A</option>
-                                    <option value="0.5">Half</option>
-                                </select>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                   
 
                 </div>
             </div>
