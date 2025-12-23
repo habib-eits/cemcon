@@ -1,7 +1,7 @@
 {{-- @if ($employees->count())
     <div class="card mb-4 border-primary">
         <div class="card-header bg-dark text-white">
-            <h5 class="mb-0 text-white">Fixed + Overtime ({{ $fixed_ot->count() }} Employees)</h5>
+            <h5 class="mb-0 text-white">Hourly Paid ({{ $hourly->count() }} Employees)</h5>
         </div>
         <div class="card-body p-0">
             <table class="table table-bordered table-sm table-striped mb-0">
@@ -12,7 +12,7 @@
                         <th>Designation</th>
                         <th>Project</th>
                         <th>Attendance</th>
-                        <th>Overtime (Hours)</th>
+                        <th>Hours Worked</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +41,7 @@
                                 </select>
                             </td>
                             <td>
-                                <input type="number" name="ot[]" class="form-control">
+                                <input type="number" name="worked_hours[]" step="0.25" class="form-control">
                             </td>
                         </tr>
                     @endforeach
@@ -50,10 +50,10 @@
         </div>
     </div>
 @endif --}}
-@if ($fixed_ot->count())
+@if ($hourly->count())
     <div class="card mb-4 border-primary">
         <div class="card-header bg-dark text-white">
-            <h5 class="mb-0 text-white">Fixed + Overtime ({{ $fixed_ot->count() }} Employees)</h5>
+            <h5 class="mb-0 text-white">Hourly Paid ({{ $hourly->count() }} Employees)</h5>
         </div>
         <div class="card-body p-0">
             <table class="table table-bordered table-sm table-striped mb-0">
@@ -64,11 +64,11 @@
                         <th>Designation</th>
                         <th>Project</th>
                         <th>Attendance</th>
-                        <th>Overtime (Hours)</th>
+                        <th>Hours Worked</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($fixed_ot as $row)
+                    @foreach ($hourly as $row)
                         <tr>
                             <td>
                                 {{ $row->EmployeeID }}
@@ -102,8 +102,8 @@
                                 </select>
                             </td>
                             <td>
-                                <input type="number" step="0.25" name="ot[]" class="form-control"
-                                    value="{{ $details[$row->EmployeeID]->over_time ?? 0 }}">
+                                <input type="number" step="0.25" name="worked_hours[]" class="form-control"
+                                    value="{{ $details[$row->EmployeeID]->worked_hours ?? 0 }}">
                             </td>
                         </tr>
                     @endforeach

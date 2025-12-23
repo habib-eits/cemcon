@@ -11,7 +11,7 @@ class Attendance extends Model
 {
     use HasFactory;
 
-     protected $fillable = [
+    protected $fillable = [
         'date',
         'time',
         'office_hours',
@@ -19,15 +19,23 @@ class Attendance extends Model
         'branch_id',
     ];
 
-     // Attendance belongs to a user
+    // Attendance belongs to a user
     public function user()
     {
-        return $this->belongsTo(User::class,'user_id','UserID');
+        return $this->belongsTo(User::class, 'user_id', 'UserID');
     }
 
     // Attendance belongs to a branch
     public function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id','BranchID');
+        return $this->belongsTo(Branch::class, 'branch_id', 'BranchID');
+    }
+
+    /**
+     * Attendance has many AttendanceDetails (per employee)
+     */
+    public function details()
+    {
+        return $this->hasMany(AttendanceDetail::class, 'attendance_id', 'id');
     }
 }
