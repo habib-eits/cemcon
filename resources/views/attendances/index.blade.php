@@ -11,8 +11,11 @@
 
                 <!-- Page Title -->
                 <div class="row mb-3">
-                    <div class="col-12">
+                    <div class="col-9">
                         <h4 class="mb-0">Attendance List</h4>
+                    </div>
+                    <div class="col-3 text-end">
+                        <a href="{{ route('attendances.create') }}" class="btn btn-primary"> <i class="bx bx-plus"></i>Add</a>
                     </div>
                 </div>
 
@@ -35,7 +38,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($attendances as $attendance)
+                                            @foreach ($attendances as $attendance)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $attendance->date }}</td>
@@ -57,13 +60,8 @@
                                                         </form>
                                                     </td>
                                                 </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted">
-                                                        No attendance records found.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
+                                            @endforeach
+                                               
                                         </tbody>
                                     </table>
 

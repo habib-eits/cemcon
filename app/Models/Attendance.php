@@ -30,4 +30,9 @@ class Attendance extends Model
     {
         return $this->belongsTo(Branch::class,'branch_id','BranchID');
     }
+
+    public function details()
+    {
+        return $this->hasMany(AttendanceDetail::class);
+    }
 }

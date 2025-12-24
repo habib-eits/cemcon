@@ -1,52 +1,52 @@
-<!-- ==================== 1. Fixed Salary ==================== -->
-@if ($fixed->count() > 0)
-    <div class="card mb-4 border-primary">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Fixed Salary ({{ $fixed->count() }} Employees)</h5>
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-bordered table-sm table-striped mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th>S#</th>
-                        <th>Employee</th>
-                        <th>Designation</th>
-                        <th>Project</th>
-                        <th>Attendance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($fixed as $value)
-                        <tr>
-                            <td>
-                                {{ $value->EmployeeID }}
-                                <input type="hidden" name="EmployeeID[]"
-                                    value="{{ $value->EmployeeID }}">
-                                <input type="hidden" name="SalaryTypeID[]"
-                                    value="{{ $value->AllowanceListID }}">
-                            </td>
-                            <td>{{ $value->FullName }}</td>
-                            <td>{{ $value->JobTitleName }}</td>
-                            <td>
-                                <select name="JobID[]" class="form-select form-select-sm">
-                                    @foreach ($job as $j)
-                                        <option value="{{ $j->JobID }}">{{ $j->JobNo }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select name="Attendance[]" class="form-select form-select-sm"
-                                    style="width: 80px;">
-                                    <option value="1">P</option>
-                                    <option value="0">A</option>
-                                    <option value="0.5">Half</option>
-                                </select>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-@endif
+ <table class="table table-sm">
+    <thead class="">
+        <tr>
+            <th style="width: 5%">S#</th>
+            <th style="width: 15%">Employee</th>
+            <th style="width: 10%">Designation</th>
+            <th style="width: 30%">Project</th>
+            <th style="width: 10%">Status</th>
+            <th style="width: 10%">Office Hrs</th>
+            <th style="width: 10%">Worked Hrs</th>
+            <th style="width: 10%">OT</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($fixed as $row)
+            <tr>
+                <input type="hidden" name="salary_type_id[]" value="{{ $row->SalaryTypeID }}">
+                <input type="hidden" name="employee_id[]" value="{{ $row->EmployeeID }}">
+                <td>
+                    {{ $row->EmployeeID }}
+                </td>
+                <td>{{ $row->FirstName }}</td>
+                <td>{{ $row->jobTitle->JobTitleName ?? 'N/A' }}</td>
+                <td>
+                    <select name="job_id[]" class="form-select select2">
+                        @foreach ($jobs as $j)
+                            <option value="{{ $j->JobID }}">{{ $j->JobNo }}
+                            </option>
+                        @endforeach
+                    </select>
+                </td>
+                <td>
+                    <select name="status[]" class="form-select row-status">
+                        <option value="1">P</option>
+                        <option value="0">A</option>
+                        <option value="0.5">Half</option>
+                    </select>
+                </td>
+                
+                <td>
+                    <input type="number" name="office_hours[]" class="form-control" step="0.01" value="{{ $attendance->office_hours  }}" readonly>
+                </td>
+                <td>
+                    <input type="number" name="worked_hours[]" class="form-control" step="0.01" value="{{ $attendance->office_hours }}">
+                </td>
+                <td>
+                    <input type="number" name="over_time[]" class="form-control" step="0.01">
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>

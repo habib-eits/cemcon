@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Attendance;
+use App\Models\AttendanceDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -91,7 +92,31 @@ class AttendanceController extends Controller
      */
     public function show($id)
     {
-        //
+        $attendance = Attendance::with('details')->find($id);
+        $attendanceDetails = $attendance->details->groupBy('salary_type_id');
+
+
+         $salaryTypes = [
+            [
+                'name' => 'Fixed Salary',
+                'employees' => $attendanceDetails->get(1, collect())
+            ],
+            [
+                'name' => 'Fixed Salary + Over Time',
+                'employees' => $attendanceDetails->get(2, collect())
+            ],
+            [
+                'name' => 'Hourly',
+                'employees' => $attendanceDetails->get(3, collect())
+            ],
+            [
+                'name' => 'Per Day',
+                'employees' => $attendanceDetails->get(4, collect())
+            ],
+        ];    
+
+        return view('attendances.show', compact('salaryTypes'));
+         
     }
 
     /**
@@ -104,24 +129,43 @@ class AttendanceController extends Controller
     {
         $attendance = Attendance::find($id);
 
-
-        $employees =  Employee::with([
+        $employees = Employee::with([
             'jobTitle',
             'supervisor',
             'department',
-            ])
-            ->where('StaffType', '<>', 'Inactive')
-            ->where('BranchID', $attendance->branch_id)
-            ->orderBy('EmployeeID');
+        ])
+        ->where('StaffType', '<>', 'Inactive')
+        ->where('BranchID', $attendance->branch_id)
+        ->orderBy('EmployeeID')
+        ->get();
+        $employeesBySalary = $employees->groupBy('SalaryTypeID');
+
+        $salaryTypes = [
+            [
+                'name' => 'Fixed Salary',
+                'employees' => $employeesBySalary->get(1, collect())
+            ],
+            [
+                'name' => 'Fixed Salary + Over Time',
+                'employees' => $employeesBySalary->get(2, collect())
+            ],
+            [
+                'name' => 'Hourly',
+                'employees' => $employeesBySalary->get(3, collect())
+            ],
+            [
+                'name' => 'Per Day',
+                'employees' => $employeesBySalary->get(4, collect())
+            ],
+        ];
+
+       
             
         return view('attendances.edit', [
             'attendance' =>  $attendance,
             'branches' =>  DB::table('branch')->get(),
             'jobs' =>  DB::table('job')->get(),
-            'fixed' => $employees->where('SalaryTypeID', 1)->get(),
-            'fixed_ot' => $employees->where('SalaryTypeID', 2)->get(),
-            'hourly' => $employees->where('SalaryTypeID', 3)->get(),
-            'perday' => $employees->where('SalaryTypeID', 4)->get(),
+            'salaryTypes' => $salaryTypes
         ]);
     }
 
@@ -134,7 +178,27 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
+        $attendance = Attendance::find($id);
+
+        for($i = 0; $i < count($request->employee_id); $i++)
+        {
+            AttendanceDetail::create([
+                'attendance_id' => $attendance->id,
+                'date'          => $attendance->date,
+                'office_hours'  => $attendance->office_hours,
+                'branch_id'     => $attendance->branch_id,
+
+                'employee_id'   => $request->employee_id[$i],
+                'salary_type_id'=> $request->salary_type_id[$i],
+                'job_id'        => $request->job_id[$i],
+                'status'        => $request->status[$i],
+                'worked_hours'  => $request->worked_hours[$i],
+                'over_time'     => $request->over_time[$i],
+            ]);
+        }
+        
+        
     }
 
     /**
