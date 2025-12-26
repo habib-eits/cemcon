@@ -109,7 +109,7 @@
             // Fill fields
             $('#employeeName').val(data.employeeName);
 
-            $('#status').val(data.status);
+            $('#status-edit').val(data.status);
 
             $('#job_id').val(data.jobId).trigger('change');
 

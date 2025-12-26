@@ -79,7 +79,7 @@
                     <div class="row mt-2">
                         <div class="col-12">
                             <label><strong>Status *</strong></label>
-                            <select name="status" id="status" class="form-select" required>
+                            <select name="status" id="status-edit" class="form-select" required>
                                 <option value="1">Present</option>
                                 <option value="0">Absent</option>
                                 <option value="0.5">Half Day</option>
