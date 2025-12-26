@@ -71,10 +71,17 @@
                                                     <td>{{ $detail->over_time }}</td>
                                                     <td>
                                                         <button type="button" class="btn btn-sm btn-primary"
-                                                            data-bs-toggle="modal" data-bs-target="#editModal"
-                                                            onclick="loadEmployeeData({{ $detail->id }})">
+                                                            onclick="editAttendanceDetail(this)"
+                                                            data-detail-id="{{ $detail->id }}"
+                                                            data-employee-id="{{ $detail->employee_id }}"
+                                                            data-employee-name="{{ $detail->employee->FirstName }} {{$detail->employee->LastName}}"
+                                                            data-status="{{ $detail->status }}"
+                                                            data-job-id="{{ $detail->job_id }}"
+                                                            data-worked="{{ $detail->worked_hours }}"
+                                                            data-ot="{{ $detail->over_time }}">
                                                             Edit
                                                         </button>
+
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -93,43 +100,32 @@
     @include('attendances.partials.edit_attendance_modal')
 
     <script>
-        function loadEmployeeData(detailId) {
-            // Find the detail data from the table row
-            const row = document.querySelector(`button[onclick="loadEmployeeData(${detailId})"]`).closest('tr');
-            const employeeName = row.cells[1].textContent.trim();
-            const status = row.querySelector('.badge').textContent.trim();
-            const project = row.cells[3].textContent.trim();
-            const worked = row.cells[6].textContent.trim();
-            const ot = row.cells[7].textContent.trim();
+        function editAttendanceDetail(button) {
 
-            // Fill modal
-            document.getElementById('employeeName').value = employeeName;
+            const data = button.dataset;
 
-            // Map text to value
-            const statusMap = {
-                'Present': '1',
-                'Absent': '0',
-                'Half Day': '0.5'
-            };
-            // console.log(statusMap);
-            document.getElementById('status').value = statusMap[status] || '1';
+            // Debug (optional)
+            console.log(data);
 
-            // Find project option
-            const jobSelect = document.getElementById('job_id');
-            for (let option of jobSelect.options) {
-                if (option.text === project) {
-                    option.selected = true;
-                    break;
-                }
-            }
+            // Fill fields
+            $('#employeeName').val(data.employeeName);
 
-            document.getElementById('worked_hours').value = worked || 0;
-            document.getElementById('over_time').value = ot || 0;
+            $('#status').val(data.status);
+
+            $('#job_id').val(data.jobId).trigger('change');
+
+            $('#worked_hours').val(data.worked || 0);
+            $('#over_time').val(data.ot || 0);
 
             // Set form action
-            document.getElementById('editForm').action =
-                `/attendances/{{ $attendance->id }}/detail/${detailId}`;
+            $('#attendanceEditForm').attr(
+                'action',
+                `/attendances/{{ $attendance->id }}/detail/${data.detailId}`
+            );
 
+            // Show modal
+            $('#attendanceEditModal').modal('show');
         }
     </script>
+
 @endsection
