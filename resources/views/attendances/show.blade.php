@@ -5,6 +5,12 @@
         <div class="page-content">
             <div class="container-fluid">
 
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span>{{ Session::get('success') }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
                 <!-- Page Title & Header Info -->
                 <div class="row mb-4">
                     <div class="col-12">
