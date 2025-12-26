@@ -70,17 +70,16 @@
                                                     <td>{{ $detail->worked_hours }}</td>
                                                     <td>{{ $detail->over_time }}</td>
                                                     <td>
-                                                        <button type="button" class="btn btn-sm btn-primary"
-                                                            onclick="editAttendanceDetail(this)"
-                                                            data-detail-id="{{ $detail->id }}"
+                                                        <a href="#" onclick="editAttendanceDetail(this)"
+                                                            class="text-secondary" data-detail-id="{{ $detail->id }}"
                                                             data-employee-id="{{ $detail->employee_id }}"
-                                                            data-employee-name="{{ $detail->employee->FirstName }} {{$detail->employee->LastName}}"
+                                                            data-employee-name="{{ $detail->employee->FirstName }} {{ $detail->employee->LastName }}"
                                                             data-status="{{ $detail->status }}"
                                                             data-job-id="{{ $detail->job_id }}"
                                                             data-worked="{{ $detail->worked_hours }}"
                                                             data-ot="{{ $detail->over_time }}">
-                                                            Edit
-                                                        </button>
+                                                            <i class="mdi mdi-pencil font-size-18 align-middle"></i>
+                                                        </a>
 
                                                     </td>
                                                 </tr>
