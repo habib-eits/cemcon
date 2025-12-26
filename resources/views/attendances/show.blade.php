@@ -61,7 +61,7 @@
                                                         @elseif($detail->status == '0')
                                                             <span class="badge bg-danger">Absent</span>
                                                         @elseif($detail->status == '0.5')
-                                                            <span class="badge bg-danger">Half Day</span>
+                                                            <span class="badge bg-warning">Half Day</span>
                                                         @else
                                                             <span class="badge bg-secondary">Unknown</span>
                                                         @endif
