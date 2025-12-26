@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Job;
 use App\Models\Employee;
 use App\Models\Attendance;
-use App\Models\AttendanceDetail;
 use Illuminate\Http\Request;
+use App\Models\AttendanceDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
@@ -29,16 +30,16 @@ class AttendanceController extends Controller
      */
     public function create()
     {
-    
+
 
         $employees =  Employee::with([
             'jobTitle',
             'supervisor',
             'department',
-            ])
+        ])
             ->where('StaffType', '<>', 'Inactive')
             ->orderBy('EmployeeID');
-            
+
         return view('attendances.create', [
             'branches' =>  DB::table('branch')->get(),
             'jobs' =>  DB::table('job')->get(),
@@ -67,7 +68,7 @@ class AttendanceController extends Controller
             'branch_id' => $request->branch_id,
             'date' => $request->date,
         ])
-        ->exists();
+            ->exists();
 
         if ($is_exists) {
             return back()->withErrors([
@@ -79,9 +80,7 @@ class AttendanceController extends Controller
 
         $attendance =  Attendance::create($validated);
 
-        return redirect()->route('attendances.edit',$attendance->id);
-        
-        
+        return redirect()->route('attendances.edit', $attendance->id);
     }
 
     /**
@@ -92,11 +91,14 @@ class AttendanceController extends Controller
      */
     public function show($id)
     {
-        $attendance = Attendance::with('details')->find($id);
+        $attendance = Attendance::with('details', 'details.job')->find($id);
+
+        // dd($attendance);
         $attendanceDetails = $attendance->details->groupBy('salary_type_id');
+        // dd($attendanceDetails);
 
-
-         $salaryTypes = [
+        // dd($attendanceDetails);
+        $salaryTypes = [
             [
                 'name' => 'Fixed Salary',
                 'employees' => $attendanceDetails->get(1, collect())
@@ -113,10 +115,11 @@ class AttendanceController extends Controller
                 'name' => 'Per Day',
                 'employees' => $attendanceDetails->get(4, collect())
             ],
-        ];    
+        ];
 
-        return view('attendances.show', compact('salaryTypes'));
-         
+        $jobs = Job::all();
+
+        return view('attendances.show', compact('salaryTypes', 'attendance', 'jobs'));
     }
 
     /**
@@ -134,10 +137,10 @@ class AttendanceController extends Controller
             'supervisor',
             'department',
         ])
-        ->where('StaffType', '<>', 'Inactive')
-        ->where('BranchID', $attendance->branch_id)
-        ->orderBy('EmployeeID')
-        ->get();
+            ->where('StaffType', '<>', 'Inactive')
+            ->where('BranchID', $attendance->branch_id)
+            ->orderBy('EmployeeID')
+            ->get();
         $employeesBySalary = $employees->groupBy('SalaryTypeID');
 
         $salaryTypes = [
@@ -159,8 +162,8 @@ class AttendanceController extends Controller
             ],
         ];
 
-       
-            
+
+
         return view('attendances.edit', [
             'attendance' =>  $attendance,
             'branches' =>  DB::table('branch')->get(),
@@ -178,11 +181,10 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $attendance = Attendance::find($id);
 
-        for($i = 0; $i < count($request->employee_id); $i++)
-        {
+        for ($i = 0; $i < count($request->employee_id); $i++) {
             AttendanceDetail::create([
                 'attendance_id' => $attendance->id,
                 'date'          => $attendance->date,
@@ -190,15 +192,28 @@ class AttendanceController extends Controller
                 'branch_id'     => $attendance->branch_id,
 
                 'employee_id'   => $request->employee_id[$i],
-                'salary_type_id'=> $request->salary_type_id[$i],
+                'salary_type_id' => $request->salary_type_id[$i],
                 'job_id'        => $request->job_id[$i],
                 'status'        => $request->status[$i],
                 'worked_hours'  => $request->worked_hours[$i],
                 'over_time'     => $request->over_time[$i],
             ]);
         }
-        
-        
+    }
+
+    public function updateDetail(Request $request, $attendanceId, $detailId)
+    {
+        // dd($request->all());
+        $detail = AttendanceDetail::findOrFail($detailId);
+
+        $detail->update([
+            'status' => $request->status,
+            'job_id' => $request->job_id,
+            'worked_hours' => $request->worked_hours ?? 0,
+            'over_time' => $request->over_time ?? 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Attendance updated successfully!');
     }
 
     /**

@@ -860,6 +860,8 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
 
 
     Route::resource('attendances', AttendanceController::class);
+    Route::put('attendances/{attendance}/detail/{detail}', [AttendanceController::class, 'updateDetail'])
+    ->name('attendances.update-detail');
 
 
 

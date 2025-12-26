@@ -9,6 +9,8 @@ class AttendanceDetail extends Model
 {
     use HasFactory;
 
+    protected $table = 'attendance_details';
+
     protected $fillable = [
         'attendance_id',
         'date',
@@ -21,4 +23,15 @@ class AttendanceDetail extends Model
         'over_time',
         'branch_id',
     ];
+
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id', 'EmployeeID');
+    }
+
+    public function job()
+    {
+        return $this->belongsTo(Job::class, 'job_id', 'JobID');
+    }
 }

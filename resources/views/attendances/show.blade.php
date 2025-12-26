@@ -2,19 +2,32 @@
 @section('title', 'Attendance')
 @section('content')
     <div class="main-content">
-
         <div class="page-content">
             <div class="container-fluid">
 
-         
-                   
+                <!-- Page Title & Header Info -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Attendance Record</h4>
+                            <div class="text-end">
+                                <p class="mb-0"><strong>Branch:</strong> {{ $attendance->branch->BranchName ?? '-' }}</p>
+                                <p class="mb-0"><strong>Date:</strong>
+                                    {{ $attendance->date }}</p>
+                                <p class="mb-0"><strong>Office Hours:</strong> {{ $attendance->office_hours }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
 
                 @foreach ($salaryTypes as $type)
                     <div class="col-md-12">
-                        <div class="card-header bg-light fw-bold"> {{ $type['name'] }}</div>
+                        <div class="card-header bg-light fw-bold"> {{ $type['name'] }} ({{ $type['employees']->count() }}
+                            Employees)</div>
                         <div class="card">
                             <div class="card-body">
-                                @if (count($type['employees']) < 1)
+                                @if ($type['employees']->count() == 0)
                                     <p class="text-center text-warning">No Employee</p>
                                 @else
                                     <table class="table table-sm">
@@ -28,51 +41,40 @@
                                                 <th style="width: 10%">Office Hrs</th>
                                                 <th style="width: 10%">Worked Hrs</th>
                                                 <th style="width: 10%">OT</th>
+                                                <th style="width: 10%">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($type['employees'] as $row)
+                                            @foreach ($type['employees'] as $detail)
+                                                @php
+                                                    $employee = $detail->employee;
+                                                @endphp
                                                 <tr>
-                                                    <input type="hidden" name="salary_type_id[]"
-                                                        value="{{ $row->SalaryTypeID }}">
-                                                    <input type="hidden" name="employee_id[]"
-                                                        value="{{ $row->EmployeeID }}">
-                                                    <td>
-                                                        {{ $row->EmployeeID }}
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $employee->FirstName ?? '' }} {{ $employee->LastName ?? '' }}
                                                     </td>
-                                                    <td>{{ $row->FirstName }}</td>
-                                                    <td>{{ $row->jobTitle->JobTitleName ?? 'N/A' }}</td>
+                                                    <td>{{ $employee->jobTitle->JobTitleName ?? '-' }}</td>
+                                                    <td>{{ $detail->job->JobNo ?? '-' }}</td>
                                                     <td>
-                                                        <select name="job_id[]" class="form-select select2">
-                                                            @foreach ($jobs as $j)
-                                                                <option value="{{ $j->JobID }}">
-                                                                    {{ $j->JobNo }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                        @if ($detail->status == '1')
+                                                            <span class="badge bg-success">Present</span>
+                                                        @elseif($detail->status == '0')
+                                                            <span class="badge bg-danger">Absent</span>
+                                                        @elseif($detail->status == '0.5')
+                                                            <span class="badge bg-danger">Half Day</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">Unknown</span>
+                                                        @endif
                                                     </td>
+                                                    <td>{{ $detail->office_hours }}</td>
+                                                    <td>{{ $detail->worked_hours }}</td>
+                                                    <td>{{ $detail->over_time }}</td>
                                                     <td>
-                                                        <select name="status[]" class="form-select row-status">
-                                                            <option value="1">P</option>
-                                                            <option value="0">A</option>
-                                                            <option value="0.5">Half</option>
-                                                        </select>
-                                                    </td>
-
-                                                    <td>
-                                                        <input type="number" name="office_hours[]"
-                                                            class="form-control row-office-hours" step="0.01"
-                                                            value="{{ $attendance->office_hours }}" readonly>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" name="worked_hours[]"
-                                                            class="form-control row-worked-hours toggle-readonly"
-                                                            step="0.01" value="{{ $attendance->office_hours }}">
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" name="over_time[]"
-                                                            class="form-control row-over-time toggle-readonly"
-                                                            step="0.01" value="0">
+                                                        <button type="button" class="btn btn-sm btn-primary"
+                                                            data-bs-toggle="modal" data-bs-target="#editModal"
+                                                            onclick="loadEmployeeData({{ $detail->id }})">
+                                                            Edit
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -83,15 +85,51 @@
                         </div>
                     </div>
                 @endforeach
-
-                   
-              
-
-
-
             </div>
         </div>
     </div>
 
-  
+    <!-- Edit Modal -->
+    @include('attendances.partials.edit_attendance_modal')
+
+    <script>
+        function loadEmployeeData(detailId) {
+            // Find the detail data from the table row
+            const row = document.querySelector(`button[onclick="loadEmployeeData(${detailId})"]`).closest('tr');
+            const employeeName = row.cells[1].textContent.trim();
+            const status = row.querySelector('.badge').textContent.trim();
+            const project = row.cells[3].textContent.trim();
+            const worked = row.cells[6].textContent.trim();
+            const ot = row.cells[7].textContent.trim();
+
+            // Fill modal
+            document.getElementById('employeeName').value = employeeName;
+
+            // Map text to value
+            const statusMap = {
+                'Present': '1',
+                'Absent': '0',
+                'Half Day': '0.5'
+            };
+            // console.log(statusMap);
+            document.getElementById('status').value = statusMap[status] || '1';
+
+            // Find project option
+            const jobSelect = document.getElementById('job_id');
+            for (let option of jobSelect.options) {
+                if (option.text === project) {
+                    option.selected = true;
+                    break;
+                }
+            }
+
+            document.getElementById('worked_hours').value = worked || 0;
+            document.getElementById('over_time').value = ot || 0;
+
+            // Set form action
+            document.getElementById('editForm').action =
+                `/attendances/{{ $attendance->id }}/detail/${detailId}`;
+
+        }
+    </script>
 @endsection
