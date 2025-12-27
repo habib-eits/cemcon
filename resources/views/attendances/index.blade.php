@@ -46,6 +46,9 @@
                                                     <td>{{ $attendance->user->FullName ?? 'N/A' }}</td>
                                                     <td>{{ $attendance->branch->BranchName ?? 'N/A' }}</td>
                                                     <td>
+                                                        <a href="{{ route('attendances.show', $attendance->id) }}" title="Show" class="btn btn-warning">
+                                                           Show
+                                                        </a>
                                                         <!-- Delete Button -->
                                                         <form action="{{ route('attendances.destroy', $attendance->id) }}"
                                                             method="POST"
