@@ -18,7 +18,24 @@ class AttendanceDetail extends Model
         'status',
         'office_hours',
         'worked_hours',
-        'over_time',
+        'overtime',
         'branch_id',
     ];
+
+    public function attendance()
+    {
+        return $this->belongsTo(Attendance::class);
+    }
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class,'employee_id','EmployeeID');
+    }
+    public function salaryType()
+    {
+        return $this->belongsTo(SalaryType::class,'salary_type_id','SalaryTypeID');
+    }
+    public function job()
+    {
+        return $this->belongsTo(Job::class,'job_id','JobID');
+    }
 }

@@ -24,29 +24,30 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JobController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AjaxController;
-use App\Http\Controllers\AttendanceController;
-//HR
 use App\Http\Controllers\ChartOfAccount;
+//HR
 use App\Http\Controllers\LeadController;
-
 use App\Http\Controllers\StaffController;
+
+use App\Http\Controllers\BranchController;
 
 
 // CRM CONTROLLERS
-use App\Http\Controllers\BranchController;
-
 use App\Http\Controllers\ReportController;
+
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\BookingController;
- use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CompanyController;
+ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\EmployeeDetailController;
 use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\JobProfitLossReport;
 use App\Http\Controllers\SaleOrderController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\SubServiceController;
+use App\Http\Controllers\EmployeeDetailController;
+use App\Http\Controllers\AttendanceDetailController;
 
 
 
@@ -613,12 +614,7 @@ Route::get('/JobCompletionReport/{jobid}',[JobController::class,'JobCompletionRe
     Route::get('/DBDump/', [Accounts::class, 'DBDump']);
 
 
-    Route::get('Backup', function () {
-
-        /* php artisan migrate */
-        \Artisan::call('database:backup');
-        dd("Done");
-    });
+   
 
 
 
@@ -860,6 +856,8 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
 
 
     Route::resource('attendances', AttendanceController::class);
+    Route::get('attendances/{id}/pdf', [AttendanceController::class, 'generatePdf'])->name('attendances.generatePdf');
+    Route::resource('attendance-details', AttendanceDetailController::class);
 
 
 

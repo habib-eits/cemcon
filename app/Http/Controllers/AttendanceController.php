@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Attendance;
-use App\Models\AttendanceDetail;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\AttendanceDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
@@ -94,7 +95,8 @@ class AttendanceController extends Controller
     {
         $attendance = Attendance::with('details')->find($id);
         $attendanceDetails = $attendance->details->groupBy('salary_type_id');
-
+        $jobs = DB::table('job')->get();
+        
 
          $salaryTypes = [
             [
@@ -115,7 +117,7 @@ class AttendanceController extends Controller
             ],
         ];    
 
-        return view('attendances.show', compact('salaryTypes'));
+        return view('attendances.show', compact('salaryTypes','jobs'));
          
     }
 
@@ -194,7 +196,7 @@ class AttendanceController extends Controller
                 'job_id'        => $request->job_id[$i],
                 'status'        => $request->status[$i],
                 'worked_hours'  => $request->worked_hours[$i],
-                'over_time'     => $request->over_time[$i],
+                'overtime'     => $request->overtime[$i],
             ]);
         }
         
@@ -211,4 +213,39 @@ class AttendanceController extends Controller
     {
         //
     }
+
+
+    public function generatePdf($id)
+    {
+        $attendance = Attendance::find($id);
+        $attendanceDetails = $attendance->details->groupBy('salary_type_id');
+
+         $salaryTypes = [
+            [
+                'name' => 'Fixed Salary',
+                'employees' => $attendanceDetails->get(1, collect())
+            ],
+            [
+                'name' => 'Fixed Salary + Over Time',
+                'employees' => $attendanceDetails->get(2, collect())
+            ],
+            [
+                'name' => 'Hourly',
+                'employees' => $attendanceDetails->get(3, collect())
+            ],
+            [
+                'name' => 'Per Day',
+                'employees' => $attendanceDetails->get(4, collect())
+            ],
+        ];    
+
+        // return view('attendances.pdf', compact('salaryTypes'));
+        $pdf = Pdf::loadView('attendances.pdf', compact('salaryTypes'));
+        return $pdf->stream('attendance_report.pdf'); // Or ->download('attendance_report.pdf')
+
+
+
+    }
+
+    
 }

@@ -112,7 +112,7 @@
                                                                 step="0.01" value="{{ $attendance->office_hours }}">
                                                         </td>
                                                         <td>
-                                                            <input type="number" name="over_time[]"
+                                                            <input type="number" name="overtime[]"
                                                                 class="form-control row-over-time toggle-readonly"
                                                                 step="0.01" value="0">
                                                         </td>

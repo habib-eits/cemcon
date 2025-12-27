@@ -17,6 +17,8 @@
     <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/libs/toastr/build/toastr.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/notyf/3.10.0/notyf.min.css" integrity="sha512-ZX18S8AwqoIm9QCd1EYun82IryFikdJt7lxj6583zx5Rvr5HoreO9tWY6f2VhSxvK+48vYFSf4zFtX/t2ge62g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 
     <style>
 /* Select2 Large (Bootstrap-like) */
@@ -113,6 +115,17 @@ $(document).ready(function () {
 
 });
 </script>
+ <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script>
+        // Create an instance of Notyf
+        let notyf = new Notyf({
+            duration: 3000,
+            position: {
+                x: 'right',
+                y: 'top',
+            },
+        });
+    </script>
  <div class="">
         @yield('content')
         @include('template.footer')

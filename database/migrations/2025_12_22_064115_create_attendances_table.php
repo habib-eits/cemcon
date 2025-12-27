@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->unique(['branch_id', 'date']);
+            $table->boolean('is_locked')->default(0);
 
 
             $table->timestamps();
@@ -35,10 +36,11 @@ return new class extends Migration
             $table->unsignedBigInteger('salary_type_id');
             $table->unsignedBigInteger('job_id');
             $table->string('status');
-            $table->integer('office_hours')->default(8);
-            $table->decimal('worked_hours', 5, 2)->default(0);
-            $table->decimal('over_time', 6,2)->default(0);
+            $table->integer('office_hours')->nullable();
+            $table->decimal('worked_hours', 5, 2)->nullable();
+            $table->decimal('overtime', 6,2)->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
+            $table->boolean('is_locked')->default(0);
 
             $table->timestamps();
         });
