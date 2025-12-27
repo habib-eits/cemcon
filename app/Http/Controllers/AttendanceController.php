@@ -188,13 +188,13 @@ class AttendanceController extends Controller
                 'over_time'     => $request->over_time[$i],
             ]);
         }
-        
-        
+
+        return redirect()->route('attendances.show', $attendance->id)->with('success', 'Attendance Marked Sccessfully');
     }
 
     /**
      * Remove the specified resource from storage.
-     *
+     
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
