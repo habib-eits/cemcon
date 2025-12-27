@@ -92,30 +92,21 @@ class AttendanceController extends Controller
      */
     public function show($id)
     {
-        $attendance = Attendance::with('details')->find($id);
+        $attendance = Attendance::with([
+            'details.employee.jobTitle',
+            'details.job'
+        ])->find($id);
+
         $attendanceDetails = $attendance->details->groupBy('salary_type_id');
 
+        $salaryTypes = [
+            ['name' => 'Fixed Salary', 'employees' => $attendanceDetails->get(1, collect())],
+            ['name' => 'Fixed Salary + Over Time', 'employees' => $attendanceDetails->get(2, collect())],
+            ['name' => 'Hourly', 'employees' => $attendanceDetails->get(3, collect())],
+            ['name' => 'Per Day', 'employees' => $attendanceDetails->get(4, collect())],
+        ];
 
-         $salaryTypes = [
-            [
-                'name' => 'Fixed Salary',
-                'employees' => $attendanceDetails->get(1, collect())
-            ],
-            [
-                'name' => 'Fixed Salary + Over Time',
-                'employees' => $attendanceDetails->get(2, collect())
-            ],
-            [
-                'name' => 'Hourly',
-                'employees' => $attendanceDetails->get(3, collect())
-            ],
-            [
-                'name' => 'Per Day',
-                'employees' => $attendanceDetails->get(4, collect())
-            ],
-        ];    
-
-        return view('attendances.show', compact('salaryTypes'));
+        return view('attendances.show', compact('salaryTypes', 'attendance'));
          
     }
 
@@ -183,7 +174,7 @@ class AttendanceController extends Controller
 
         for($i = 0; $i < count($request->employee_id); $i++)
         {
-            AttendanceDetail::create([
+           AttendanceDetail::create([
                 'attendance_id' => $attendance->id,
                 'date'          => $attendance->date,
                 'office_hours'  => $attendance->office_hours,
@@ -210,5 +201,17 @@ class AttendanceController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function updateSpecificRecord(Request $request)
+    {
+        AttendanceDetail::where('id', $request->id)->update([
+            'status'        => $request->status,
+            'office_hours'  => $request->office_hours,
+            'worked_hours'  => $request->worked_hours,
+            'over_time'     => $request->over_time,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }
