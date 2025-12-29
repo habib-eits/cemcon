@@ -17,6 +17,15 @@ return new class extends Migration
             $table->id();
             $table->date('salary_month');
             $table->integer('month_days');
+
+            $table->integer('working_days');
+            $table->decimal('office_hours',15,2);
+            $table->decimal('overtime_per_hour',15,2);
+
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unique(['branch_id', 'date']);
+            $table->boolean('is_locked')->default(0);
             $table->timestamps();
         });
 

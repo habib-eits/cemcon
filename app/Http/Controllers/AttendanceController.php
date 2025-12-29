@@ -117,7 +117,7 @@ class AttendanceController extends Controller
             ],
         ];    
 
-        return view('attendances.show', compact('salaryTypes','jobs'));
+        return view('attendances.show', compact('salaryTypes','jobs','attendance'));
          
     }
 
@@ -200,6 +200,7 @@ class AttendanceController extends Controller
             ]);
         }
         
+        return redirect()->route('attendances.show',$attendance->id);
         
     }
 

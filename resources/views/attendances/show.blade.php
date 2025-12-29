@@ -6,6 +6,18 @@
         <div class="page-content">
             <div class="container-fluid">
 
+                <div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap">
+                                <div class="p-2 m-1 bg-light">{{ date('d-m-Y', strtotime($attendance->date)) }}</div>
+                                <div class="p-2 m-1 bg-light">{{ $attendance->branch->BranchName }}</div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 @foreach ($salaryTypes as $type)
                     <div class="col-md-12">
                         <div class="card-header bg-light fw-bold"> {{ $type['name'] }}</div>
