@@ -35,10 +35,11 @@ use App\Http\Controllers\BranchController;
 // CRM CONTROLLERS
 use App\Http\Controllers\ReportController;
 
+use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\CompanyController;
  use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EstimateController;
@@ -46,12 +47,9 @@ use App\Http\Controllers\JobProfitLossReport;
 use App\Http\Controllers\SaleOrderController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\SubServiceController;
+use App\Http\Controllers\SalaryDetailController;
 use App\Http\Controllers\EmployeeDetailController;
 use App\Http\Controllers\AttendanceDetailController;
-
-
-
-
 
 Route::get('/base1/', [KM::class, 'base1']);
 Route::post('/base2/', [KM::class, 'base2']);
@@ -859,7 +857,8 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
     Route::get('attendances/{id}/pdf', [AttendanceController::class, 'generatePdf'])->name('attendances.generatePdf');
     Route::resource('attendance-details', AttendanceDetailController::class);
 
-
+    Route::resource('salaries', SalaryController::class);
+    Route::resource('salary-details', SalaryDetailController::class);
 
 
 });

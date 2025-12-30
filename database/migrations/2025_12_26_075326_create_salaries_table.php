@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('salaries', function (Blueprint $table) {
             $table->id();
-            $table->date('salary_month');
+            $table->date('salary_period');
             $table->integer('month_days');
 
             $table->integer('working_days');
@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
-            $table->unique(['branch_id', 'date']);
+            $table->unique(['branch_id', 'salary_period']);
             $table->boolean('is_locked')->default(0);
             $table->timestamps();
         });

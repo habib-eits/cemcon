@@ -31,22 +31,8 @@ class AttendanceController extends Controller
     public function create()
     {
     
-
-        $employees =  Employee::with([
-            'jobTitle',
-            'supervisor',
-            'department',
-            ])
-            ->where('StaffType', '<>', 'Inactive')
-            ->orderBy('EmployeeID');
-            
         return view('attendances.create', [
             'branches' =>  DB::table('branch')->get(),
-            'jobs' =>  DB::table('job')->get(),
-            'fixed' => $employees->where('SalaryTypeID', 1)->get(),
-            'fixed_ot' => $employees->where('SalaryTypeID', 2)->get(),
-            'hourly' => $employees->where('SalaryTypeID', 3)->get(),
-            'perday' => $employees->where('SalaryTypeID', 4)->get(),
         ]);
     }
 
