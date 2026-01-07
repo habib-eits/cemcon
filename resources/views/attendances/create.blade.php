@@ -50,7 +50,7 @@
                                 <div class="mb-3">
                                     <label for="basicpill-firstname-input">Office Hours  <span
                                         class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" name="office_hours" value="{{ old('office_hours',8) }}">
+                                    <input type="number" class="form-control" name="office_hours_per_day" value="{{ old('office_hours_per_day',8) }}">
                                 </div>
                             </div>
                            

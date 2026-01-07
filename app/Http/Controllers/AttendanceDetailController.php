@@ -77,7 +77,7 @@ class AttendanceDetailController extends Controller
             'job_id' => $request->job_id,
             'status' => $request->status,
             'worked_hours' => $request->worked_hours,
-            'over_time' => $request->over_time,
+            'overtime' => $request->overtime,
         ]);
 
         return response()->json(['message' => 'Record updated successfully!']);

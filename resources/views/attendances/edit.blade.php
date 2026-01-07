@@ -43,8 +43,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label>Office Hours <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control" name="office_hours"
-                                            value="{{ $attendance->office_hours }}" readonly>
+                                        <input type="number" class="form-control" name="office_hours_per_day"
+                                            value="{{ $attendance->office_hours_per_day }}" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -102,14 +102,14 @@
                                                         </td>
 
                                                         <td>
-                                                            <input type="number" name="office_hours[]"
+                                                            <input type="number" name="office_hours_per_day[]"
                                                                 class="form-control row-office-hours" step="0.01"
-                                                                value="{{ $attendance->office_hours }}" readonly>
+                                                                value="{{ $attendance->office_hours_per_day }}" readonly>
                                                         </td>
                                                         <td>
                                                             <input type="number" name="worked_hours[]"
                                                                 class="form-control row-worked-hours toggle-readonly"
-                                                                step="0.01" value="{{ $attendance->office_hours }}">
+                                                                step="0.01" value="{{ $attendance->office_hours_per_day }}">
                                                         </td>
                                                         <td>
                                                             <input type="number" name="overtime[]"

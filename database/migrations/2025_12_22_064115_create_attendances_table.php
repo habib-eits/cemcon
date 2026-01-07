@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->time('time')->nullable();
-            $table->integer('office_hours')->default(8);
+            $table->integer('office_hours_per_day')->default(8);
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->unique(['branch_id', 'date']);
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->unsignedBigInteger('salary_type_id');
             $table->unsignedBigInteger('job_id');
             $table->string('status');
-            $table->integer('office_hours')->nullable();
+            $table->integer('office_hours_per_day')->nullable();
             $table->decimal('worked_hours', 5, 2)->nullable();
             $table->decimal('overtime', 6,2)->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();

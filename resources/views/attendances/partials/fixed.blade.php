@@ -38,10 +38,10 @@
                 </td>
                 
                 <td>
-                    <input type="number" name="office_hours[]" class="form-control" step="0.01" value="{{ $attendance->office_hours  }}" readonly>
+                    <input type="number" name="office_hours_per_day[]" class="form-control" step="0.01" value="{{ $attendance->office_hours_per_day  }}" readonly>
                 </td>
                 <td>
-                    <input type="number" name="worked_hours[]" class="form-control" step="0.01" value="{{ $attendance->office_hours }}">
+                    <input type="number" name="worked_hours[]" class="form-control" step="0.01" value="{{ $attendance->office_hours_per_day }}">
                 </td>
                 <td>
                     <input type="number" name="over_time[]" class="form-control" step="0.01">

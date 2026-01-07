@@ -47,7 +47,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'date' => 'required',
             'branch_id' => 'required',
-            'office_hours' => 'required|numeric',
+            'office_hours_per_day' => 'required|numeric',
         ]);
 
         $is_exists = Attendance::where([
@@ -124,6 +124,7 @@ class AttendanceController extends Controller
         ])
         ->where('StaffType', '<>', 'Inactive')
         ->where('BranchID', $attendance->branch_id)
+        ->select('EmployeeID','SalaryTypeID','FirstName','JobTitleID')
         ->orderBy('EmployeeID')
         ->get();
         $employeesBySalary = $employees->groupBy('SalaryTypeID');
@@ -174,7 +175,7 @@ class AttendanceController extends Controller
             AttendanceDetail::create([
                 'attendance_id' => $attendance->id,
                 'date'          => $attendance->date,
-                'office_hours'  => $attendance->office_hours,
+                'office_hours_per_day'  => $attendance->office_hours_per_day,
                 'branch_id'     => $attendance->branch_id,
 
                 'employee_id'   => $request->employee_id[$i],

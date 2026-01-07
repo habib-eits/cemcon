@@ -15,16 +15,17 @@ return new class extends Migration
     {
         Schema::create('salaries', function (Blueprint $table) {
             $table->id();
-            $table->date('salary_period');
-            $table->integer('month_days');
+            $table->date('salary_month');
+            $table->unsignedTinyInteger('total_days');
 
-            $table->integer('working_days');
-            $table->decimal('office_hours',15,2);
-            $table->decimal('overtime_per_hour',15,2);
+            $table->unsignedTinyInteger('working_days');
+            $table->decimal('office_hours_per_day',15,2);
+            $table->decimal('overtime_hourly_rate',15,2);
+            $table->decimal('basic_hourly_rate',15,2);
 
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
-            $table->unique(['branch_id', 'salary_period']);
+            $table->unique(['branch_id', 'salary_month']);
             $table->boolean('is_locked')->default(0);
             $table->timestamps();
         });
@@ -37,20 +38,20 @@ return new class extends Migration
             $table->unsignedBigInteger('job_title_id');
 
             // Basic salary
-            $table->decimal('basic_salary_amount', 15, 2);
+            $table->decimal('basic_salary', 15, 2);
             $table->decimal('basic_hourly_rate', 15, 2);
-            $table->decimal('basic_worked_hours', 15, 2);
-            $table->decimal('basic_total_amount', 15, 2);
+            $table->decimal('basic_hours_worked', 15, 2);
+            $table->decimal('basic_total', 15, 2);
 
             // Overtime
             $table->decimal('overtime_hourly_rate', 15, 2);
             $table->decimal('overtime_hours', 15, 2);
-            $table->decimal('overtime_total_amount', 15, 2);
+            $table->decimal('overtime_total', 15, 2);
 
             // Final amounts
-            $table->decimal('gross_salary_amount', 15, 2);
-            $table->decimal('advance_amount', 15, 2);
-            $table->decimal('net_salary_amount', 15, 2);
+            $table->decimal('gross_salary', 15, 2);
+            $table->decimal('advance_paid', 15, 2);
+            $table->decimal('net_salary', 15, 2);
 
             $table->timestamps();
         });

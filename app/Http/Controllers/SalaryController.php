@@ -18,7 +18,8 @@ class SalaryController extends Controller
      */
     public function index()
     {
-        //
+        $salaries = Salary::all();
+        return view('salaries.index', compact('salaries'));
     }
 
     /**
@@ -43,18 +44,20 @@ class SalaryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'salary_period'      => 'required|date_format:Y-m-d',
-            'month_days'        => 'required|integer|min:1',
+            'salary_month'     => 'required',
+            'total_days'        => 'required|integer|min:1',
             'working_days'      => 'required|integer|min:0',
-            'office_hours'      => 'required|numeric|min:0',
-            'overtime_per_hour' => 'required|numeric|min:0',
+            'office_hours_per_day'      => 'required|numeric|min:0',
+            'overtime_hourly_rate' => 'required|numeric|min:1',
+            'basic_hourly_rate'    => 'required|numeric|min:1',
             'branch_id'         => 'required|exists:Branch,BranchID',
         ]);
 
 
+
         $is_exists = Salary::where('branch_id', $request->branch_id)
-        ->whereYear('salary_period', Carbon::parse($request->salary_period)->year)
-        ->whereMonth('salary_period', Carbon::parse($request->salary_period)->month)
+        ->whereYear('salary_month', Carbon::parse($request->salary_month)->year)
+        ->whereMonth('salary_month', Carbon::parse($request->salary_month)->month)
         ->exists();
 
         if ($is_exists) {
@@ -91,7 +94,72 @@ class SalaryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $salary = Salary::findOrFail($id);
+        $period = Carbon::parse($salary->salary_month);
+
+
+        $employees = Employee::with([
+            'jobTitle',
+            'supervisor',
+            'department',
+        ])
+
+        ->where('StaffType', '<>', 'Inactive')
+        ->where('BranchID', $salary->branch_id)
+        ->orderBy('EmployeeID')
+        ->select('EmployeeID','SalaryTypeID','FirstName','JobTitleID','Salary')
+        ->get();
+
+        $employees = $employees->each(function($employee) use ($period,$salary){
+
+            $attendanceRecord = DB::table('attendance_details')
+            ->where('employee_id', $employee->EmployeeID)
+            ->whereMonth('date', $period->month)
+            ->whereYear('date', $period->year);
+
+            $workedHours    = $attendanceRecord->sum('worked_hours');
+            $overtimeHours  = $attendanceRecord->sum('overtime');
+
+            $basicRate = $employee->Salary != null
+            ? $employee->Salary
+            : $salary->basic_hourly_rate;
+
+            $overtimeRate = $salary->overtime_hourly_rate;
+
+            $basicAmount = $basicRate * $workedHours;
+            $overtimeAmount = $overtimeRate * $overtimeHours;
+            $grossAmount = $basicAmount + $overtimeAmount;
+    
+            // basic    
+            $employee->basic_hourly_rate = $basicRate;
+            $employee->worked_hours = $workedHours;
+            $employee->basic_total = $basicAmount;
+            
+            // overtime
+            $employee->overtime_hourly_rate = $overtimeRate;
+            $employee->overtime_hours = $overtimeHours;
+            $employee->overtime_total = $overtimeAmount;
+
+            $employee->gross_salary = $grossAmount;
+        });
+
+
+
+        $employeesBySalary = $employees->groupBy('SalaryTypeID');
+        $salaryTypes = [
+            ['name' => 'Fixed Salary','employees' => $employeesBySalary->get(1, collect())],
+            ['name' => 'Fixed Salary + Over Time','employees' => $employeesBySalary->get(2, collect())],
+            ['name' => 'Hourly','employees' => $employeesBySalary->get(3, collect())],
+            ['name' => 'Per Day','employees' => $employeesBySalary->get(4, collect())],
+        ];
+
+        return view('salaries.edit', [
+            'salary' =>  $salary,
+            'branches' =>  DB::table('branch')->get(),
+            'jobs' =>  DB::table('job')->get(),
+            'salaryTypes' => $salaryTypes
+        ]);
+
     }
 
     /**

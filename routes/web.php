@@ -50,6 +50,7 @@ use App\Http\Controllers\SubServiceController;
 use App\Http\Controllers\SalaryDetailController;
 use App\Http\Controllers\EmployeeDetailController;
 use App\Http\Controllers\AttendanceDetailController;
+use App\Http\Controllers\ExpenseController;
 
 Route::get('/base1/', [KM::class, 'base1']);
 Route::post('/base2/', [KM::class, 'base2']);
@@ -561,17 +562,22 @@ Route::get('/JobCompletionReport/{jobid}',[JobController::class,'JobCompletionRe
 
 
     // =====================================Expense Section=====================================
-    Route::get('/Expense', [Accounts::class, 'Expense']);
-    Route::get('/ExpenseCreate/', [Accounts::class, 'ExpenseCreate']);
-    Route::get('/ajax_Expense', [Accounts::class, 'ajax_Expense']);
+    
+    Route::resource('expense', ExpenseController::class);
+    
+    
+    
+    // Route::get('/Expense', [Accounts::class, 'Expense']);
+    // Route::get('/ExpenseCreate/', [Accounts::class, 'ExpenseCreate']);
+    // Route::get('/ajax_Expense', [Accounts::class, 'ajax_Expense']);
 
-    Route::post('/ExpenseSave', [Accounts::class, 'ExpenseSave']);
-    Route::get('/ExpenseEdit/{id}', [Accounts::class, 'ExpenseEdit']);
-    Route::get('/ExpensePDF/{id}', [Accounts::class, 'ExpensePDF']);
-    Route::get('/ExpenseView/{id}', [Accounts::class, 'ExpenseView']);
+    // Route::post('/ExpenseSave', [Accounts::class, 'ExpenseSave']);
+    // Route::get('/ExpenseEdit/{id}', [Accounts::class, 'ExpenseEdit']);
+    // Route::get('/ExpensePDF/{id}', [Accounts::class, 'ExpensePDF']);
+    // Route::get('/ExpenseView/{id}', [Accounts::class, 'ExpenseView']);
 
-    Route::post('/ExpenseUpdate/{id}', [Accounts::class, 'ExpenseUpdate']);
-    Route::get('/ExpenseDelete/{id}', [Accounts::class, 'ExpenseDelete']);
+    // Route::post('/ExpenseUpdate/{id}', [Accounts::class, 'ExpenseUpdate']);
+    // Route::get('/ExpenseDelete/{id}', [Accounts::class, 'ExpenseDelete']);
 
     Route::get('/TaxReportSupplier/', [Accounts::class, 'TaxReportSupplier']);
     Route::post('/TaxReportSupplier1/', [Accounts::class, 'TaxReportSupplier1']);

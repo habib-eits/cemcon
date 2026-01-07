@@ -16,20 +16,20 @@ class SalaryDetail extends Model
         'job_title_id',
 
         // Basic salary
-        'basic_salary_amount',
+        'basic_salary',
         'basic_hourly_rate',
-        'basic_worked_hours',
-        'basic_total_amount',
+        'basic_hours_worked',
+        'basic_total',
 
         // Overtime
         'overtime_hourly_rate',
         'overtime_hours',
-        'overtime_total_amount',
+        'overtime_total',
 
         // Final amounts
-        'gross_salary_amount',
-        'advance_amount',
-        'net_salary_amount',
+        'gross_salary',
+        'advance_paid',
+        'net_salary',
     ];
 
     // Relationships

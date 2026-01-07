@@ -11,11 +11,10 @@
                 <!-- start page title -->
 
                 <!-- enctype="multipart/form-data" -->
-                <form action="{{ URL('/ExpenseSave') }}" method="post" class="custom-validation">
+                <form action="{{ URL('/expense') }}" method="post" class="custom-validation">
 
 
-                    <input type="hidden" name="_token" id="csrf" value="{{ Session::token() }}">
-
+                    @csrf
 
                     <div class="card shadow-sm">
                         <div class="card-body">
@@ -228,8 +227,8 @@
                             </div>
                             
                             <div class="mt-2"><button type="submit"
-                                    class="btn btn-success w-md float-right">Update</button>
-                                <a href="{{ URL('/DeliveryChallan') }}"
+                                    class="btn btn-success w-md float-right">Save</button>
+                                <a href="{{ URL('/expense') }}"
                                     class="btn btn-secondary w-md float-right">Cancel</a>
 
                             </div>

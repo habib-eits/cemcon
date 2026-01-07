@@ -14,7 +14,7 @@ class Attendance extends Model
      protected $fillable = [
         'date',
         'time',
-        'office_hours',
+        'office_hours_per_day',
         'user_id',
         'branch_id',
     ];

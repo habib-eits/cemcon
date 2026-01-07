@@ -16,7 +16,7 @@ class AttendanceDetail extends Model
         'salary_type_id',
         'job_id',
         'status',
-        'office_hours',
+        'office_hours_per_day',
         'worked_hours',
         'overtime',
         'branch_id',
