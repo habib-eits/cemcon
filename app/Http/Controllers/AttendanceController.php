@@ -199,7 +199,10 @@ class AttendanceController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $attendance = Attendance::find($id);
+        $attendance->details() ->delete();
+        $attendance->delete();
+        return redirect()->route('attendances.index');
     }
 
 

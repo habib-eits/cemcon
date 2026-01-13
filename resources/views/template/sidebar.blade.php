@@ -23,6 +23,30 @@
 
                 </li>
                 <li>
+                    <a href="{{ route('attendances.index') }}" class="waves-effect text-success">
+                        <i class="bx bx bx-basket"></i>
+
+                        <span key="t-dashboards ">Attendance</span>
+                    </a>
+
+                </li>
+                <li>
+                    <a href="{{ route('salaries.index') }}" class="waves-effect text-success">
+                        <i class="bx bx bx-basket"></i>
+
+                        <span key="t-dashboards ">Salary</span>
+                    </a>
+
+                </li>
+                <li>
+                    <a href="{{ URL('/Item') }}" class="waves-effect">
+                        <i class="bx bx bx-basket"></i>
+
+                        <span key="t-dashboards">Items</span>
+                    </a>
+
+                </li>
+                <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="mdi mdi-cart-outline"></i>
                         <span key="t-ecommerce">Sale</span>

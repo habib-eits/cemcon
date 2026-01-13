@@ -35,6 +35,7 @@
                                                 <th>User</th>
                                                 <th>Branch</th>
                                                 <th>Actions</th>
+                                               
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -45,8 +46,22 @@
                                                     <td>{{ $attendance->time ?? '-' }}</td>
                                                     <td>{{ $attendance->user->FullName ?? 'N/A' }}</td>
                                                     <td>{{ $attendance->branch->BranchName ?? 'N/A' }}</td>
-                                                    <td>
-                                                        <!-- Delete Button -->
+                                                    <td class="text-nowrap">
+                                                        <!-- Edit -->
+                                                        <a href="{{ route('attendances.show', $attendance->id) }}"
+                                                            class="btn btn-sm btn-primary me-1"
+                                                            title="Edit">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+
+                                                        <!-- PDF -->
+                                                        <a href="{{ route('attendances.generatePdf', $attendance->id) }}"
+                                                            class="btn btn-sm btn-success me-1"
+                                                            title="Download PDF">
+                                                            <i class="fa fa-file-pdf"></i>
+                                                        </a>
+
+                                                        <!-- Delete -->
                                                         <form action="{{ route('attendances.destroy', $attendance->id) }}"
                                                             method="POST"
                                                             onsubmit="return confirm('Are you sure you want to delete this attendance?')"
@@ -54,11 +69,14 @@
                                                             @csrf
                                                             @method('DELETE')
 
-                                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                                Delete
+                                                            <button type="submit"
+                                                                class="btn btn-sm btn-danger"
+                                                                title="Delete">
+                                                                <i class="fa fa-trash"></i>
                                                             </button>
                                                         </form>
                                                     </td>
+
                                                 </tr>
                                             @endforeach
                                                
