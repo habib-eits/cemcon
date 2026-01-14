@@ -6,11 +6,18 @@ use Carbon\Carbon;
 use App\Models\Salary;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Services\SalaryService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class SalaryController extends Controller
 {
+    public $service;
+
+    public function __construct(SalaryService $service)
+    {
+        $this->service = $service;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -53,12 +60,7 @@ class SalaryController extends Controller
             'branch_id'         => 'required|exists:Branch,BranchID',
         ]);
 
-
-
-        $is_exists = Salary::where('branch_id', $request->branch_id)
-        ->whereYear('salary_month', Carbon::parse($request->salary_month)->year)
-        ->whereMonth('salary_month', Carbon::parse($request->salary_month)->month)
-        ->exists();
+        $is_exists = $this->service->isSalaryCreated($request);
 
         if ($is_exists) {
             return back()->withErrors([
@@ -106,32 +108,7 @@ class SalaryController extends Controller
 
 
 
-    public function basicHourlyRate($baseSalary,Salary $salary)
-    {
-        $days = $salary->working_days;
-        $hours = $salary->office_hours_per_day;
-        $hourlyRate = $baseSalary / $days / $hours;
-        
-        return round($hourlyRate,6);
-    }
-    public function overtimeHourlyRate($baseSalary,Salary $salary)
-    {
-        $days = 30;
-        $rate = $salary->overtime_working_day_rate;
-        $hours = $salary->office_hours_per_day;
-        $hourlyRate = ($baseSalary / $days / $hours) * $rate;
-        return round($hourlyRate,6);
-    }
-    public function holidayOvertimeHourlyRate($baseSalary,Salary $salary)
-    {
-        $days = 30;
-        $rate = $salary->overtime_holiday_rate;
-        $hours = $salary->office_hours_per_day;
-
-       $hourlyRate = ($baseSalary / $days / $hours) * $rate;
-
-        return round($hourlyRate,6);
-    }
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -144,73 +121,44 @@ class SalaryController extends Controller
         $salary = Salary::findOrFail($id);
         $period = Carbon::parse($salary->salary_month);
 
-
-        $employees = Employee::with([
-            'jobTitle',
-            'supervisor',
-            'department',
-        ])
-
-        ->where('StaffType', '<>', 'Inactive')
-        ->where('BranchID', $salary->branch_id)
-        ->orderBy('EmployeeID')
-        ->select('EmployeeID','SalaryTypeID','FirstName','JobTitleID','Salary')
-        ->get();
+        $employees = Employee::with(['jobTitle', 'supervisor', 'department'])
+            ->where('StaffType', '<>', 'Inactive')
+            ->where('BranchID', $salary->branch_id)
+            ->orderBy('EmployeeID')
+            ->select('EmployeeID','SalaryTypeID','FirstName','JobTitleID','Salary')
+            ->get();
 
         $employees->each(function ($employee) use ($period, $salary) {
 
-            $attendance = DB::table('attendance_details')
-                ->selectRaw('
-                    SUM(worked_hours) as basic_worked_hours,
-                    SUM(CASE WHEN is_holiday = 0 THEN overtime ELSE 0 END) as overtime_hours,
-                    SUM(CASE WHEN is_holiday = 1 THEN overtime ELSE 0 END) as holiday_overtime_hours
-                ')
-                ->where('employee_id', $employee->EmployeeID)
-                ->whereMonth('date', $period->month)
-                ->whereYear('date', $period->year)
-                ->first();
+            $attendanceSummary = $this->service
+                ->getEmployeeMonthlyAttendanceTotals($employee, $period);
 
-            $employee->salary_base_amount = $employee->Salary;
-            $employee->salary_base_per_day = round($employee->Salary / $salary->working_days,2);    
+            $salaryData = $this->service
+                ->getEmployeeSalaryCalculations($employee, $salary, $attendanceSummary);
 
-
-            $employee->basic_worked_hours = $attendance->basic_worked_hours;
-            $employee->overtime_hours = $attendance->overtime_hours;
-            $employee->holiday_overtime_hours = $attendance->holiday_overtime_hours;
-
-            $employee->basic_hourly_rate = $this->basicHourlyRate($employee->Salary, $salary);
-            $employee->overtime_hourly_rate = $this->overtimeHourlyRate($employee->Salary, $salary);
-            $employee->holiday_overtime_hourly_rate = $this->holidayOvertimeHourlyRate($employee->Salary, $salary);
-
-            $employee->basic_total = round($employee->basic_hourly_rate * $employee->basic_worked_hours,2);
-            $employee->overtime_total = round($employee->overtime_hourly_rate * $employee->overtime_hours, 2);
-            $employee->holiday_overtime_total = round($employee->holiday_overtime_hourly_rate * $employee->holiday_overtime_hours,2);
-
-            $employee->advance_paid =  0;
-            $employee->gross_salary =  $employee->basic_total + $employee->overtime_total + $employee->holiday_overtime_total - $employee->advance_paid;
-            $employee->net_salary   =  $employee->basic_total + $employee->overtime_total + $employee->holiday_overtime_total - $employee->advance_paid; 
-        
+            // Attach calculated fields to employee
+            foreach ($salaryData as $key => $value) {
+                $employee->{$key} = $value;
+            }
         });
 
-
-
         $employeesBySalary = $employees->groupBy('SalaryTypeID');
+
         $salaryTypes = [
-            ['name' => 'Fixed Salary','employees' => $employeesBySalary->get(1, collect())],
-            ['name' => 'Fixed Salary + Over Time','employees' => $employeesBySalary->get(2, collect())],
-            ['name' => 'Hourly','employees' => $employeesBySalary->get(3, collect())],
-            ['name' => 'Per Day','employees' => $employeesBySalary->get(4, collect())],
+            ['name' => 'Fixed Salary', 'employees' => $employeesBySalary->get(1, collect())],
+            ['name' => 'Fixed Salary + Over Time', 'employees' => $employeesBySalary->get(2, collect())],
+            ['name' => 'Hourly', 'employees' => $employeesBySalary->get(3, collect())],
+            ['name' => 'Per Day', 'employees' => $employeesBySalary->get(4, collect())],
         ];
 
-
         return view('salaries.edit', [
-            'salary' =>  $salary,
-            'branches' =>  DB::table('branch')->get(),
-            'jobs' =>  DB::table('job')->get(),
+            'salary' => $salary,
+            'branches' => DB::table('branch')->get(),
+            'jobs' => DB::table('job')->get(),
             'salaryTypes' => $salaryTypes
         ]);
-
     }
+
 
     /**
      * Update the specified resource in storage.
