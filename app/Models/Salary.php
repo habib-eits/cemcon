@@ -11,14 +11,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Salary extends Model
 {
     use HasFactory;
-
+    
     protected $fillable = [
         'salary_month',
         'total_days',
         'working_days',
         'office_hours_per_day',
-        'overtime_hourly_rate',
-        'basic_hourly_rate',
+        'overtime_working_day_rate',
+        'overtime_holiday_rate',
         'user_id',
         'branch_id',
         'is_locked',

@@ -61,7 +61,7 @@
                                     <div class="mb-3">
                                         <label for="working_days">Working Days <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" name="working_days" id="working_days"
-                                            value="{{ old('working_days', 22) }}">
+                                            value="{{ old('working_days', date('t')) }}">
                                     </div>
                                 </div>
 
@@ -74,29 +74,30 @@
                                     </div>
                                 </div>
 
-                                <!-- Basic Per Hour -->
+                                <!-- OT Working Days Rate -->
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <label for="overtime_hourly_rate">Basic Per Hour Rate 
+                                        <label for="overtime_hourly_rate">OT Working Days Rate 
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <input type="number" step="0.01" class="form-control" name="basic_hourly_rate"
-                                            id="basic_hourly_rate" value="{{ old('basic_hourly_rate', 0) }}">
+                                        <input type="number" step="0.01" class="form-control" name="overtime_working_day_rate"
+                                            id="overtime_working_day_rate" value="{{ old('overtime_working_day_rate', 1.25) }}">
                                     </div>
                                 </div>
-                                <!-- Overtime Per Hour -->
+                                <!-- OT Holiday Rate -->
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <label for="overtime_hourly_rate">Overtime Per Hour Rate 
+                                        <label for="overtime_hourly_rate">OT Holiday Rate 
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <input type="number" step="0.01" class="form-control" name="overtime_hourly_rate"
-                                            id="overtime_hourly_rate" value="{{ old('overtime_hourly_rate', 0) }}">
+                                        <input type="number" step="0.01" class="form-control" name="overtime_holiday_rate"
+                                            id="overtime_holiday_rate" value="{{ old('overtime_holiday_rate', 1.5) }}">
                                     </div>
                                 </div>
+                               
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Save Salary</button>
+                            <button type="submit" class="btn btn-primary">Save Salary Settings</button>
 
 
                         </form>

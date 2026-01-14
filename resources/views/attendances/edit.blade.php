@@ -25,7 +25,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="row align-items-end">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="mb-3">
                                         <label>Branch <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control"
@@ -33,18 +33,25 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="mb-3">
                                         <label>Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" name="date"
                                             value="{{ $attendance->date }}" readonly>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="mb-3">
                                         <label>Office Hours <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" name="office_hours_per_day"
                                             value="{{ $attendance->office_hours_per_day }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label>Working Day <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="is_holiday"
+                                            value="{{ $attendance->is_holiday }}" readonly>
                                     </div>
                                 </div>
                             </div>

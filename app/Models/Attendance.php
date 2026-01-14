@@ -15,6 +15,7 @@ class Attendance extends Model
         'date',
         'time',
         'office_hours_per_day',
+        'is_holiday',
         'user_id',
         'branch_id',
     ];

@@ -11,7 +11,10 @@ class AttendanceDetail extends Model
 
     protected $fillable = [
         'attendance_id',
+
         'date',
+        'is_holiday',
+        
         'employee_id',
         'salary_type_id',
         'job_id',

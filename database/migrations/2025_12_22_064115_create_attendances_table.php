@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->time('time')->nullable();
-            $table->integer('office_hours_per_day')->default(8);
+            $table->tinyInteger('office_hours_per_day')->default(8);
+            $table->boolean('is_holiday')->default(1);
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->unique(['branch_id', 'date']);
@@ -31,7 +32,10 @@ return new class extends Migration
         Schema::create('attendance_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('attendance_id');
+            
             $table->date('date');
+            $table->boolean('is_holiday')->default(1);
+
             $table->unsignedBigInteger('employee_id');
             $table->unsignedBigInteger('salary_type_id');
             $table->unsignedBigInteger('job_id');

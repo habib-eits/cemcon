@@ -45,17 +45,34 @@
                                                     <td>{{ date('M Y', strtotime($salary->salary_month)) }}</td>
                                                     <td>{{ $salary->user->FullName ?? 'N/A' }}</td>
                                                     <td>{{ $salary->branch->BranchName ?? 'N/A' }}</td>
-                                                    <td>
-                                                        <!-- Delete Button -->
+                                                  
+                                                    <td class="text-nowrap">
+                                                        <!-- Edit -->
+                                                        <a href="{{ route('salaries.edit', $salary->id) }}"
+                                                            class="btn btn-sm btn-primary me-1"
+                                                            title="Edit">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+
+                                                        <!-- PDF -->
+                                                        {{-- <a href="{{ route('salaries.generatePdf', $salary->id) }}"
+                                                            class="btn btn-sm btn-success me-1"
+                                                            title="Download PDF">
+                                                            <i class="fa fa-file-pdf"></i>
+                                                        </a> --}}
+
+                                                        <!-- Delete -->
                                                         <form action="{{ route('salaries.destroy', $salary->id) }}"
                                                             method="POST"
-                                                            onsubmit="return confirm('Are you sure you want to delete this attendance?')"
+                                                            onsubmit="return confirm('Are you sure you want to delete this salary?')"
                                                             class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
 
-                                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                                Delete
+                                                            <button type="submit"
+                                                                class="btn btn-sm btn-danger"
+                                                                title="Delete">
+                                                                <i class="fa fa-trash"></i>
                                                             </button>
                                                         </form>
                                                     </td>

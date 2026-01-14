@@ -48,6 +48,7 @@ class AttendanceController extends Controller
             'date' => 'required',
             'branch_id' => 'required',
             'office_hours_per_day' => 'required|numeric',
+            'is_holiday' => 'required|numeric',
         ]);
 
         $is_exists = Attendance::where([
@@ -175,6 +176,7 @@ class AttendanceController extends Controller
             AttendanceDetail::create([
                 'attendance_id' => $attendance->id,
                 'date'          => $attendance->date,
+                'is_holiday'    => $attendance->is_holiday,
                 'office_hours_per_day'  => $attendance->office_hours_per_day,
                 'branch_id'     => $attendance->branch_id,
 

@@ -47,9 +47,9 @@ class SalaryController extends Controller
             'salary_month'     => 'required',
             'total_days'        => 'required|integer|min:1',
             'working_days'      => 'required|integer|min:0',
-            'office_hours_per_day'      => 'required|numeric|min:0',
-            'overtime_hourly_rate' => 'required|numeric|min:1',
-            'basic_hourly_rate'    => 'required|numeric|min:1',
+            'office_hours_per_day' => 'required|numeric|min:0',
+            'overtime_working_day_rate' => 'required|numeric|min:1',
+            'overtime_holiday_rate'    => 'required|numeric|min:1',
             'branch_id'         => 'required|exists:Branch,BranchID',
         ]);
 
@@ -71,6 +71,8 @@ class SalaryController extends Controller
 
         $salary =  Salary::create($validated);
 
+        return redirect()->route('salaries.edit',$salary->id);
+
         
         
     }
@@ -83,7 +85,52 @@ class SalaryController extends Controller
      */
     public function show($id)
     {
-        //
+        // Load salary with related branch, salary details, employee, job title, and salary type
+        $salary = Salary::with([
+            'branch',           // branch details
+            'details.employee', // employee related to salary details
+            'details.jobTitle', // job title of employee
+            'details.salaryType', // salary type of each detail
+        ])->findOrFail($id);
+
+        // Group salary details by Salary Type and format for the Blade
+        $salaryTypes = $salary->details->groupBy('salary_type_id')->map(function ($group) {
+            return [
+                'name' => $group->first()->salaryType->SalaryType ?? 'N/A', // get SalaryType name
+                'employees' => $group
+            ];
+        })->values();
+
+        return view('salaries.show', compact('salary', 'salaryTypes'));
+    }
+
+
+
+    public function basicHourlyRate($baseSalary,Salary $salary)
+    {
+        $days = $salary->working_days;
+        $hours = $salary->office_hours_per_day;
+        $hourlyRate = $baseSalary / $days / $hours;
+        
+        return round($hourlyRate,6);
+    }
+    public function overtimeHourlyRate($baseSalary,Salary $salary)
+    {
+        $days = 30;
+        $rate = $salary->overtime_working_day_rate;
+        $hours = $salary->office_hours_per_day;
+        $hourlyRate = ($baseSalary / $days / $hours) * $rate;
+        return round($hourlyRate,6);
+    }
+    public function holidayOvertimeHourlyRate($baseSalary,Salary $salary)
+    {
+        $days = 30;
+        $rate = $salary->overtime_holiday_rate;
+        $hours = $salary->office_hours_per_day;
+
+       $hourlyRate = ($baseSalary / $days / $hours) * $rate;
+
+        return round($hourlyRate,6);
     }
 
     /**
@@ -110,37 +157,39 @@ class SalaryController extends Controller
         ->select('EmployeeID','SalaryTypeID','FirstName','JobTitleID','Salary')
         ->get();
 
-        $employees = $employees->each(function($employee) use ($period,$salary){
+        $employees->each(function ($employee) use ($period, $salary) {
 
-            $attendanceRecord = DB::table('attendance_details')
-            ->where('employee_id', $employee->EmployeeID)
-            ->whereMonth('date', $period->month)
-            ->whereYear('date', $period->year);
+            $attendance = DB::table('attendance_details')
+                ->selectRaw('
+                    SUM(worked_hours) as basic_worked_hours,
+                    SUM(CASE WHEN is_holiday = 0 THEN overtime ELSE 0 END) as overtime_hours,
+                    SUM(CASE WHEN is_holiday = 1 THEN overtime ELSE 0 END) as holiday_overtime_hours
+                ')
+                ->where('employee_id', $employee->EmployeeID)
+                ->whereMonth('date', $period->month)
+                ->whereYear('date', $period->year)
+                ->first();
 
-            $workedHours    = $attendanceRecord->sum('worked_hours');
-            $overtimeHours  = $attendanceRecord->sum('overtime');
+            $employee->salary_base_amount = $employee->Salary;
+            $employee->salary_base_per_day = round($employee->Salary / $salary->working_days,2);    
 
-            $basicRate = $employee->Salary != null
-            ? $employee->Salary
-            : $salary->basic_hourly_rate;
 
-            $overtimeRate = $salary->overtime_hourly_rate;
+            $employee->basic_worked_hours = $attendance->basic_worked_hours;
+            $employee->overtime_hours = $attendance->overtime_hours;
+            $employee->holiday_overtime_hours = $attendance->holiday_overtime_hours;
 
-            $basicAmount = $basicRate * $workedHours;
-            $overtimeAmount = $overtimeRate * $overtimeHours;
-            $grossAmount = $basicAmount + $overtimeAmount;
-    
-            // basic    
-            $employee->basic_hourly_rate = $basicRate;
-            $employee->worked_hours = $workedHours;
-            $employee->basic_total = $basicAmount;
-            
-            // overtime
-            $employee->overtime_hourly_rate = $overtimeRate;
-            $employee->overtime_hours = $overtimeHours;
-            $employee->overtime_total = $overtimeAmount;
+            $employee->basic_hourly_rate = $this->basicHourlyRate($employee->Salary, $salary);
+            $employee->overtime_hourly_rate = $this->overtimeHourlyRate($employee->Salary, $salary);
+            $employee->holiday_overtime_hourly_rate = $this->holidayOvertimeHourlyRate($employee->Salary, $salary);
 
-            $employee->gross_salary = $grossAmount;
+            $employee->basic_total = round($employee->basic_hourly_rate * $employee->basic_worked_hours,2);
+            $employee->overtime_total = round($employee->overtime_hourly_rate * $employee->overtime_hours, 2);
+            $employee->holiday_overtime_total = round($employee->holiday_overtime_hourly_rate * $employee->holiday_overtime_hours,2);
+
+            $employee->advance_paid =  0;
+            $employee->gross_salary =  $employee->basic_total + $employee->overtime_total + $employee->holiday_overtime_total - $employee->advance_paid;
+            $employee->net_salary   =  $employee->basic_total + $employee->overtime_total + $employee->holiday_overtime_total - $employee->advance_paid; 
+        
         });
 
 
@@ -152,6 +201,7 @@ class SalaryController extends Controller
             ['name' => 'Hourly','employees' => $employeesBySalary->get(3, collect())],
             ['name' => 'Per Day','employees' => $employeesBySalary->get(4, collect())],
         ];
+
 
         return view('salaries.edit', [
             'salary' =>  $salary,
@@ -171,7 +221,36 @@ class SalaryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        foreach($request->employee_id as $index => $employeeId){
+            DB::table('salary_details')->updateOrInsert(
+                [
+                    'salary_id' => $id,
+                    'employee_id' => $employeeId,
+                ],
+                [
+                    'salary_type_id' => $request->salary_type_id[$index],
+                    'job_title_id' => $request->job_title_id[$index],
+                    'salary_base_amount' => $request->salary_base_amount[$index],
+                    'salary_base_per_day' => $request->salary_base_per_day[$index],
+                    'salary_base_type' => 'gross',
+                    'basic_worked_hours' => $request->basic_worked_hours[$index],
+                    'basic_hourly_rate' => $request->basic_hourly_rate[$index],
+                    'basic_total' => $request->basic_total[$index],
+                    'overtime_hours' => $request->overtime_hours[$index],
+                    'overtime_hourly_rate' => $request->overtime_hourly_rate[$index],
+                    'overtime_total' => $request->overtime_total[$index],
+                    'holiday_overtime_hourly_rate' => $request->holiday_overtime_hourly_rate[$index],
+                    'holiday_overtime_hours' => $request->holiday_overtime_hours[$index],
+                    'holiday_overtime_total' => $request->holiday_overtime_total[$index],
+                    'gross_salary' => $request->gross_salary[$index],
+                    'advance_paid' => $request->advance_paid[$index],
+                    'net_salary' => $request->net_salary[$index],
+                    'updated_at' => now(),
+                ]
+            );
+        }
+        
+        
     }
 
     /**
@@ -182,6 +261,11 @@ class SalaryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $salary = Salary::find($id);
+        $salary->details()->delete();
+        $salary->delete();
+        return redirect()->route('salaries.index');
+
+
     }
 }
