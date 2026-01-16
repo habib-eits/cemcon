@@ -57,7 +57,7 @@ class SalaryController extends Controller
             'office_hours_per_day' => 'required|numeric|min:0',
             'overtime_working_day_rate' => 'required|numeric|min:1',
             'overtime_holiday_rate'    => 'required|numeric|min:1',
-            'branch_id'         => 'required|exists:Branch,BranchID',
+            'branch_id'         => 'required|exists:branch,BranchID',
         ]);
 
         $is_exists = $this->service->isSalaryCreated($request);
