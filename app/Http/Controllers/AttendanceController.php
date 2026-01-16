@@ -9,6 +9,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\AttendanceDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class AttendanceController extends Controller
 {
@@ -239,6 +241,44 @@ class AttendanceController extends Controller
 
 
     }
+
+
+    public function attendanceSheet(Request $request)
+    {
+        $branches = DB::table('branch')->get();
+        $startDate = $request->startDate ?? date('Y-m-01');
+        $endDate   = $request->endDate ??   date('Y-m-d');
+        $branch_id = $request->branch_id ?? null;
+
+        // Build date list manually (ONLY between start & end)
+        $dates = [];
+        $current = Carbon::parse($startDate);
+
+        while ($current->lte(Carbon::parse($endDate))) {
+            $dates[] = $current->toDateString();
+            $current->addDay();
+        }
+
+        $attendanceDetails = AttendanceDetail::with([
+                'employee.jobTitle',
+                'employee.department',
+            ])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->when($branch_id, fn ($q) => $q->where('branch_id', $branch_id))
+            ->get()
+            ->groupBy('employee_id');
+
+        return view('attendances.monthly_sheet', compact(
+            'attendanceDetails',
+            'dates',
+            'startDate',
+            'endDate',
+            'branch_id',
+            'branches'
+        ));
+    }
+
+
 
     
 }

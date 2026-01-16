@@ -25,7 +25,7 @@ class SalaryController extends Controller
      */
     public function index()
     {
-        $salaries = Salary::all();
+        $salaries = Salary::orderBy('salary_month', 'desc')->get();
         return view('salaries.index', compact('salaries'));
     }
 

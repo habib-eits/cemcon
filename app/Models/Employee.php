@@ -18,6 +18,10 @@ class Employee extends Model
     {
         return $this->belongsTo(JobTitle::class,'JobTitleID','JobTitleID');
     }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class,'BranchID','BranchID');
+    }
     public function supervisor()
     {
         return $this->belongsTo(self::class,'SupervisorID','EmployeeID');

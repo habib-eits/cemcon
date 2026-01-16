@@ -48,12 +48,20 @@
                                                   
                                                     <td class="text-nowrap">
                                                         <!-- Edit -->
+                                                        @if($salary->details()->count() > 0)
+                                                        <a href="{{ route('salaries.show', $salary->id) }}"
+                                                            class="btn btn-sm btn-dark me-1"
+                                                            title="Edit">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+                                                        @else
                                                         <a href="{{ route('salaries.edit', $salary->id) }}"
                                                             class="btn btn-sm btn-primary me-1"
-                                                            title="Edit">
+                                                            title="Mark Attendance">
                                                             <i class="fa fa-edit"></i>
                                                         </a>
-
+                                                       
+                                                        @endif
                                                         <!-- PDF -->
                                                         {{-- <a href="{{ route('salaries.generatePdf', $salary->id) }}"
                                                             class="btn btn-sm btn-success me-1"

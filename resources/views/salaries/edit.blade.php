@@ -30,12 +30,34 @@
             border: none;
             background: none;
         }
+
+        table {
+            border-collapse: collapse;
+            border: 1px solid black !important;
+            }
+
+        tr, th, td {
+            border: 1px solid black !important;
+        }
+
+
     </style>
     <div class="main-content">
 
         <div class="page-content mt-2">
             <div class="container-fluid">
-                <h3>Salary Sheet</h3>
+                <div class="d-flex items-center justify-content-between mb-4">
+                    <h3>Salary Sheet</h3>
+                    <a type="button" href="{{ route('salaries.index') }}" class="btn btn-dark">Cancel</a>
+
+                </div>
+
+                <p class="alert alert-warning">
+                    
+                    once salary is saved , you cannot edit it again. if any changes required, please delete and recreate .
+                </p>
+                
+
                 <!-- start page title -->
                 @if (count($errors) > 0)
                     <div>
@@ -112,13 +134,13 @@
 
                     @foreach ($salaryTypes as $type)
                         <div class="col-md-12">
-                            <div class="card-header bg-light fw-bold"> {{ $type['name'] }}</div>
+                            <div class="card-header "> {{ $type['name'] }}</div>
                             <div class="card">
                                 <div class="">
                                     @if (count($type['employees']) < 1)
                                         <p class="text-center text-warning">No Employee</p>
                                     @else
-                                        <table class="table table-sm table-bordered">
+                                        <table class="table table-sm">
                                             <thead class="">
                                                 <tr>
                                                     <th colspan="4" class="col-group-1"></th>

@@ -31,10 +31,26 @@
 
                 </li>
                 <li>
+                    <a href="{{ route('attendances.sheet') }}" class="waves-effect text-success">
+                        <i class="bx bx bx-basket"></i>
+
+                        <span key="t-dashboards ">Attendance Sheet</span>
+                    </a>
+
+                </li>
+                <li>
                     <a href="{{ route('salaries.index') }}" class="waves-effect text-success">
                         <i class="bx bx bx-basket"></i>
 
                         <span key="t-dashboards ">Salary</span>
+                    </a>
+
+                </li>
+                <li>
+                    <a href="{{ route('expense.index') }}" class="waves-effect text-success">
+                        <i class="bx bx bx-basket"></i>
+
+                        <span key="t-dashboards ">Expense</span>
                     </a>
 
                 </li>

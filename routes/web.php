@@ -859,7 +859,9 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
     Route::get('salary-detail/{employee_id}', [EmployeeDetailController::class , 'salaryDetail'])->name('employee.salary-detail');
 
 
+    Route::get('attendances/sheet', [AttendanceController::class,'attendanceSheet'])->name('attendances.sheet');
     Route::resource('attendances', AttendanceController::class);
+
     Route::get('attendances/{id}/pdf', [AttendanceController::class, 'generatePdf'])->name('attendances.generatePdf');
     Route::resource('attendance-details', AttendanceDetailController::class);
 
