@@ -626,7 +626,7 @@ tinymce.init({
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">%</span>
 
-                                            <input type="text" class="form-control" value="0" id="discountper" name="DiscountPer" placeholder="Tax" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="{{$invoice_master[0]->DiscountPer}}">
+                                            <input type="text" class="form-control" id="discountper" name="DiscountPer" placeholder="Tax" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="{{ $invoice_master[0]->DiscountPer }}">
 
                                             <span class="input-group-text bg-light">{{session::get('Currency')}}</span>
 
