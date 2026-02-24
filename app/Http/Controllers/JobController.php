@@ -28,6 +28,9 @@ class JobController extends Controller
 
             return Datatables::of($data)
                 ->addIndexColumn()
+                ->editColumn('Status', function ($row) {
+                    return $row->Status == 1 ? 'Yes' : 'No';
+                })
                 ->addColumn('action', function ($row) {
                     // if you want to use direct link instead of dropdown use this line below
                     // <a href="javascript:void(0)"  onclick="edit_data('.$row->customer_id.')" >Edit</a> | <a href="javascript:void(0)"  onclick="del_data('.$row->customer_id.')"  >Delete</a>
@@ -83,6 +86,8 @@ class JobController extends Controller
             'JobDetail' => $request->JobDetail,
             'PartyID' => $request->PartyID,
             'UserID' => session::get('UserID'),
+            'Status' => $request->Status,
+
          
         );
        
@@ -260,18 +265,19 @@ $jobid=session::get('JobID');
           }
   
           // Check if invoice belongs to a previous year
-          $invoice_year = date('Y', strtotime($invoice_mst->JobDate)); // Assuming 'date' is the invoice date field
-           $current_year = date('Y');
+          // $invoice_year = date('Y', strtotime($invoice_mst->JobDate)); // Assuming 'date' is the invoice date field
+          //  $current_year = date('Y');
   
-          if ($invoice_year < $current_year) {
-              return redirect()->back()->with('error', 'You cannot delet an invoice from a previous year.')->with('class', 'danger');
-          }
+          // if ($invoice_year < $current_year) {
+          //     return redirect()->back()->with('error', 'You cannot delet an invoice from a previous year.')->with('class', 'danger');
+          // }
 
 
 
          
         $pagetitle = 'Job';
         $job = DB::table('v_job')->where('JobID',$id)->first();
+        $job->Status = $invoice_mst->Status;
         $party = DB::table('party')->get();
 
         $branch = DB::table('branch')->get();
@@ -290,6 +296,7 @@ $jobid=session::get('JobID');
             'JobDetail' => $request->JobDetail,
             'PartyID' => $request->PartyID,
             'UserID' => session::get('UserID'),
+            'Status' => $request->Status,
          
         );
 

@@ -28,7 +28,7 @@
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> REMOVED to avoid conflict with 3.7.1 -->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script src="https://cdn.tiny.cloud/1/u4kftdlqbljatz0bbmxi8h2z0m4vlo40fgky3rv2rb2aqsg3/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
@@ -470,13 +470,15 @@ tbody, td, tfoot, th, thead, tr {
                                           <td bordercolor="1" valign="top" align="left"><input class="case" type="checkbox" /></td>
 
                                           <td valign="top">
-
+                                              <div style="display: flex; align-items: center;">
                                                 <select name="ItemID0[]" id="ItemID0_1" class="item form-select  form-control-sm select2   changesNoo " onchange="km(this.value,1);" style="width: 300px !important;">
                                                     <option value="">select</option>
                                                     @foreach ($items as $key => $value)
-                                                    <option value="{{$value->ItemID}}">{{$value->ItemCode}}-{{$value->ItemName}}</option>
+                                                    <option value="{{$value->ItemID}}|{{$value->Percentage}}">{{$value->ItemName}}-{{$value->Percentage}}</option>
                                                     @endforeach
                                                 </select>
+                                                <button type="button" class="btn btn-sm btn-primary ml-2" onclick="openItemModal(this);" style="margin-left: 5px;">+</button>
+                                              </div>
                                                 <input type="hidden" name="ItemID[]" id="ItemID_1">
                                           <textarea name="Description[]" id="Description[]" rows="2" class="form-control mt-1 tiny-editor" style="width: 300px !important;"></textarea></td>
 
@@ -780,12 +782,18 @@ $(".addmore").on('click', function() {
     html += '<td valign="top" class="text-left"><input class="case" type="checkbox"/></td>';
     
     html += '<td>';
-    html += '<select name="ItemID0[]" id="ItemID0_' + i + '" style="width: 300px !important;" class="form-select select2 changesNoo" onchange="km(this.value,' + i + ');">';
+    html += '<div style="display: flex; align-items: center;">';
+    html += '<select name="ItemID0[]" id="ItemID0_' + i + '" style="width: 300px !important;" class="item form-select select2 changesNoo" onchange="km(this.value,' + i + ');">';
     html += '<option value="">select</option>';
-    @foreach ($items as $key => $value)
-    html += '<option value="{{$value->ItemID}}|{{$value->Percentage}}">{{$value->ItemCode}}-{{$value->ItemName}}-{{$value->Percentage}}</option>';
-    @endforeach
+    
+    // Use global itemsList
+    itemsList.forEach(function(item) {
+        html += '<option value="' + item.id + '|' + item.percentage + '">' + item.name + '-' + item.percentage + '</option>';
+    });
+
     html += '</select>';
+    html += '<button type="button" class="btn btn-sm btn-primary ml-2" onclick="openItemModal(this);" style="margin-left: 5px;">+</button>';
+    html += '</div>';
     html += '<input type="hidden" name="ItemID[]" id="ItemID_' + i + '">';
     html += '<textarea name="Description[]" id="Description_' + i + '" rows="2" class="form-control mt-1 kashif tiny-editor" style="width: 300px !important;"></textarea>';
     html += '</td>';
@@ -888,6 +896,19 @@ $(".addmore").on('click', function() {
  
 
 
+    // Global variables for items
+    var fullItemData = {!! $item !!};
+    var itemsList = [
+        @foreach ($items as $key => $value)
+        {
+            id: "{{$value->ItemID}}",
+            code: "{{$value->ItemCode}}",
+            name: "{{$value->ItemName}}",
+            percentage: "{{$value->Percentage}}"
+        },
+        @endforeach
+    ];
+
     function km(v, id) {
 
         // alert(v+id);
@@ -903,12 +924,12 @@ $(".addmore").on('click', function() {
 
         // alert('val done');
 
-        var data = <?php echo $item; ?>;
+        // var data = <?php echo $item; ?>; // REMOVED: Using global fullItemData
         // console.log(data);
 
         // console.log( "readaay!" );
 
-        var data = <?php echo $item; ?> // this is dynamic data in json_encode(); from controller
+        // var data = <?php echo $item; ?> // REMOVED: Using global fullItemData
 
         // console.log($('#ItemID_' + id[1]).val());
 
@@ -917,7 +938,7 @@ $(".addmore").on('click', function() {
         // console.log(item_idd);
         var index = -1;
         var val = parseInt(item_idd);
-        var json = data.find(function(item, i) {
+        var json = fullItemData.find(function(item, i) { // UPDATED: Using fullItemData
             if (item.ItemID === val) {
                 index = i + 1;
                 return i + 1;
@@ -1661,6 +1682,130 @@ function TaxIncExc()
  </script>
 
 <script src="{{asset('assets/js/myapp.js')}}" type="text/javascript"></script>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
+        {{-- <button type="button" class="close" onclick="$('#addItemModal').modal('hide');" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> --}}
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addItemForm">
+            @csrf
+            <div class="form-group mb-3 d-none">
+                <label for="newItemCode">Item Code</label>
+                <input type="text" class="form-control" id="newItemCode" name="ItemCode">
+            </div>
+            <div class="form-group mb-3">
+                <label for="newItemName">Item Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="newItemName" name="ItemName" required>
+            </div>
+            <div class="form-group mb-3 d-none">
+                <label for="newUnit">Unit <span class="text-danger d-none">*</span></label>
+                <select class="form-control" id="newUnit" name="Unit" required>
+                    <option value="">Select Unit</option>
+                    @foreach($unit as $u)
+                        <option value="{{$u->UnitName}}">{{$u->UnitName}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="newUnitQty">Unit Quantity</label>
+                <input type="number" class="form-control" id="newUnitQty" name="UnitQty" step="0.01" value="1">
+            </div>
+            <div class="form-group mb-3">
+                <label for="newCostPrice">Cost Price</label>
+                <input type="number" class="form-control" id="newCostPrice" name="CostPrice" step="0.01">
+            </div>
+            <div class="form-group mb-3">
+                <label for="newSellingPrice">Selling Price</label>
+                <input type="number" class="form-control" id="newSellingPrice" name="SellingPrice" step="0.01">
+            </div>
+
+        </form>
+        <div id="addItemError" class="alert alert-danger d-none mt-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="$('#addItemModal').modal('hide');">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewItem()">Save Item</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentTargetSelect = null;
+
+function openItemModal(btn) {
+    currentTargetSelect = $(btn).siblings('select');
+    $('#addItemForm')[0].reset();
+    $('#addItemError').addClass('d-none').text('');
+    $('#addItemModal').modal('show');
+}
+
+function saveNewItem() {
+    var formData = new FormData($('#addItemForm')[0]);
+    
+    $.ajax({
+        url: 'AjaxItemSave',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if(response.status == 'success') {
+                var newItem = {
+                    id: response.item.ItemID,
+                    // code: response.item.ItemCode,
+                    name: response.item.ItemName,
+                    percentage: response.item.Percentage || 0
+                };
+                itemsList.push(newItem);
+                fullItemData.push(response.item); // Update global data source
+                
+                var optionText = newItem.name + '-' + newItem.percentage;
+                var optionValue = newItem.id + '|' + newItem.percentage;
+                
+                var newOption = new Option(optionText, optionValue, false, false);
+                $('.item').append(newOption);
+                
+                if(currentTargetSelect) {
+                    currentTargetSelect.val(optionValue).trigger('change');
+                    var selectId = currentTargetSelect.attr('id');
+                    if(selectId) {
+                         var idParts = selectId.split('_');
+                         if(idParts.length > 1) {
+                             km(optionValue, idParts[1]);
+                         }
+                    }
+                }
+                
+                $('#addItemModal').modal('hide');
+            } else {
+                var errorMsg = response.message || 'Error saving item';
+                if(response.errors) {
+                    errorMsg = '';
+                    $.each(response.errors, function(key, value) {
+                        errorMsg += value + '<br>';
+                    });
+                }
+                $('#addItemError').removeClass('d-none').html(errorMsg);
+            }
+        },
+        error: function(xhr) {
+             $('#addItemError').removeClass('d-none').text('Server Error: ' + xhr.statusText);
+        }
+    });
+}
+</script>
 
 <!-- END: Content-->
 

@@ -173,7 +173,7 @@
                     <label class="col-form-label  " for="first-name">Account</label>
                   </div>
                   <div class="col-sm-6">
-                    <select name="CostChartofAccountID"  class="select2 form-select">
+                    <select name="CostChartofAccountID"  class="select2 form-select" readonly>
                       
                        @foreach($chartofaccount as $value)
                         <option value="{{$value->ChartOfAccountID}}" >{{$value->ChartOfAccountID}}-{{$value->ChartOfAccountName}}</option>
@@ -212,7 +212,7 @@
                     <label class="col-form-label " for="first-name">Account</label>
                   </div>
                   <div class="col-sm-6">
-                    <select name="SellingChartofAccountID"  class="form-select select2">
+                    <select name="SellingChartofAccountID"  class="form-select select2" readonly>
                       
  @foreach($chartofaccount as $value)
                         <option value="{{$value->ChartOfAccountID}}" >{{$value->ChartOfAccountID}}-{{$value->ChartOfAccountName}}</option>

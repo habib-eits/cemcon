@@ -1893,7 +1893,12 @@ class Accounts extends Controller
         $item = DB::table('item')->get();
         $unit = DB::table('unit')->get();
         $item_type = DB::table('item_type')->get();
-        $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+        // $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+        $chartofaccount = DB::table('chartofaccount')
+        ->where('ChartOfAccountID', 110000)
+        ->where('Level', 2)
+        ->get();
+
         return view('item', compact('pagetitle', 'item', 'unit', 'chartofaccount','item_type'));
     }
 
@@ -1958,7 +1963,11 @@ class Accounts extends Controller
 
         $item = DB::table('item')->where('ItemID', $id)->get();
         $unit = DB::table('unit')->get();
-        $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+        // $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+         $chartofaccount = DB::table('chartofaccount')
+        ->where('ChartOfAccountID', 110000)
+        ->where('Level', 2)
+        ->get();
 
         return view('item_edit', compact('pagetitle', 'item', 'unit', 'chartofaccount'));
     }

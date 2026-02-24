@@ -65,6 +65,7 @@
                     <th>Job#</th>
                     <th>Date</th>
                      <th width="550">Client</th>
+                     <th>Active</th>
                      <th>Created By</th>
                     
                      
@@ -90,12 +91,9 @@ $('#student_table').DataTable({
 "columns":[
 { "data": "JobNo" },
 { "data": "JobDate" },
- { "data": "PartyName" },
- { "data": "FullName" },
-
-
-
-
+{ "data": "PartyName" },
+{ "data": "Status" },
+{ "data": "FullName" },
 { "data": "action" },
 ],
 "order": [[0, 'desc']],

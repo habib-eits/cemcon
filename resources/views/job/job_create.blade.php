@@ -137,6 +137,16 @@
                	  </div>
                	   </div>
 
+                   <div class="col-md-4"> 
+                        <div class="mb-3">
+                        <label for="basicpill-firstname-input">Status <span class="text-danger">*</span></label>
+                        <select name="Status" id="Status" class="form-select" required="">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                   </div>
+
                    <div class="col-md-8">
                 <div class="mb-3">
                 <label for="verticalnav-address-input">Job Details</label>
