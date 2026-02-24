@@ -1802,7 +1802,7 @@ selector: "textarea.editme",
 
 
 
-                                            <input type="text" class="form-control" value="0" id="discountper"
+                                            <input type="text" class="form-control" id="discountper"
 
                                                 name="DiscountPer" placeholder="Tax"
 
