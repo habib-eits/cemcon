@@ -608,7 +608,8 @@ We are pleased to place order on you for the following materials subject to term
                             </tr>
                             <tr class="order_total">
                                 <td class="no-borders"></td>
-                                <th class="description">Dis {{ $invoice_master[0]->DiscountPer }}%</th>
+                                {{-- <th class="description">Dis {{ $invoice_master[0]->DiscountPer }}%</th> --}}
+                                <th class="description">Dis %</th>
                                 <td class="price"><span class="totals-price"><span
                                             class="amount">{{ number_format($invoice_master[0]->DiscountAmount, 2) }}</span></span>
                                 </td>

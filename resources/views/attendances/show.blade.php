@@ -54,7 +54,9 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $row->employee->FirstName }}</td>
                                                     <td>{{ $row->employee->jobTitle->JobTitleName ?? 'N/A' }}</td>
+                                                    @if($row->status != 0)
                                                     <td>{{ $row->job->JobNo ?? 'N/A' }}</td>
+                                                    @endif
                                                     <td class="text-end">{{ $status }}</td>
                                                     <td class="text-end">{{ $row->worked_hours }}</td>
                                                     <td class="text-end">{{ $row->overtime }}</td>

@@ -1802,13 +1802,17 @@ selector: "textarea.editme",
 
 
 
-                                            <input type="text" class="form-control" id="discountper"
+                                            {{-- <input type="text" class="form-control" id="discountper"
 
                                                 name="DiscountPer" placeholder="Tax"
 
                                                 onkeypress="return IsNumeric(event);" ondrop="return false;"
 
-                                                onpaste="return false;" value="{{$estimate_master[0]->DiscountPer}}">
+                                                onpaste="return false;" value="{{$estimate_master[0]->DiscountPer}}"> --}}
+                                                 <input type="text" class="form-control" value="0" id="discountper"
+                                                name="DiscountPer" placeholder="Tax"
+                                                onkeypress="return IsNumeric(event);" ondrop="return false;"
+                                                onpaste="return false;" readonly style="background-color:#e9ecef; cursor:not-allowed;">
 
 
 
@@ -3133,6 +3137,24 @@ function TaxIncExc()
 
     ////////////////////////////////////////////
 
+    // New function: user manually enters discount amount, update Total & Grandtotal
+    function calculateFromDiscountAmount() {
+        var subTotal = parseFloat($('#subTotal').val()) || 0;
+        var discountAmount = parseFloat($('#discountAmount').val()) || 0;
+        var grandtotaltax = parseFloat($('#grandtotaltax').val()) || 0;
+        var shipping = parseFloat($('#shipping').val()) || 0;
+
+        // Update discount % display (readonly, just for info)
+        // var discountPer = subTotal > 0 ? ((discountAmount / subTotal) * 100).toFixed(2) : 0;
+        // $('#discountper').val(discountPer); // commented: keeping % field readonly/static
+
+        var Total = subTotal - discountAmount;
+        var Grandtotal = Total + grandtotaltax + shipping;
+
+        $('#Total').val(Total.toFixed(2));
+        $('#Grandtotal').val(Grandtotal.toFixed(2));
+    }
+
 
 
     function calculatediscount() {
@@ -3145,57 +3167,58 @@ function TaxIncExc()
 
 
 
-        discountper = $('#discountper').val();
+        // discountper = $('#discountper').val();
 
          
 
-        if (discountper != '' && typeof(discountper) != "undefined") {
+        // if (discountper != '' && typeof(discountper) != "undefined") {
 
 
 
-            discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
+        //     discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
 
 
 
-            $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
+        //     $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
 
-            total = subTotal - discountamount;
+        //     total = subTotal - discountamount;
 
-            $('#Total').val(total.toFixed(2));
+        //     $('#Total').val(total.toFixed(2));
 
-            $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
-
-
+        //     $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
 
 
 
-        } else {
 
-            $('#discountper').val(0);
 
-            // alert('dd');
+        // } else {
 
-            $('#DiscountAmount').val(0);
+        //     $('#discountper').val(0);
+
+        //     // alert('dd');
+
+        //     $('#DiscountAmount').val(0);
 
             
 
 
 
-             total = subTotal - discountamount;
+        //      total = subTotal - discountamount;
 
-            $('#Total').val(total.toFixed(2));
+        //     $('#Total').val(total.toFixed(2));
 
-            $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
+        //     $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
 
              
 
 
 
-        }
+        // }
 
     
 
-         calculateTotal();
+        //  calculateTotal();
+          calculateFromDiscountAmount();
 
     }
 
@@ -3203,19 +3226,24 @@ function TaxIncExc()
 
 
 
-    $(document).on('blur', '#discountAmount', function() {
+    // $(document).on('blur', '#discountAmount', function() {
 
 
 
 
 
-        // calculatediscountper();
+    //     // calculatediscountper();
 
        
 
 
 
-    });
+    // });
+
+    $(document).on('keyup blur change', '#discountAmount', function() {
+    // calculatediscountper(); // disabled % recalculation
+    calculateFromDiscountAmount(); // new function below
+});
 
 
 

@@ -3381,7 +3381,11 @@ public function VisaAlert()
 
 {
 $pagetitle='Visa Expiry';
-$visa_alert = DB::table('v_visa_expiry_list')->get();
+$visa_alert = DB::table('v_visa_expiry_list')
+->join('employee','v_visa_expiry_list.EmployeeID','=','employee.EmployeeID')
+->select('v_visa_expiry_list.*','employee.StaffType')
+->where('employee.StaffType', '!=', 'Inactive')
+->get();
  
 return view('hr.visa_alert',compact('visa_alert','pagetitle'));
 
