@@ -427,7 +427,6 @@ session::put('Months',$diff_in_months);
 public function EmployeeUpdate(request $request)
     {   
         
-
           
 
  $this->validate($request,[
@@ -497,7 +496,7 @@ public function EmployeeUpdate(request $request)
                      
         
                       $data   = array(
-                                 
+                        "BranchID" => $request->input('BranchID'),
                        "IsSupervisor" => $request->input('IsSupervisor'), 
                       "Title" => $request->input('Title'), 
                       "FirstName" => $request->input('FirstName'), 
@@ -560,7 +559,7 @@ public function EmployeeUpdate(request $request)
                          
                          
                         $data   = array(
-                                 
+                        "BranchID" => $request->input('BranchID'),       
                        "IsSupervisor" => $request->input('IsSupervisor'), 
                        "Title" => $request->input('Title'), 
                       "FirstName" => $request->input('FirstName'), 
