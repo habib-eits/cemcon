@@ -1200,7 +1200,7 @@
 
                 <td class="no-borders"></td>
 
-                <th class="description">Dis {{ $estimate[0]->DiscountPer }}%</th>
+                <th class="description">Dis %</th>
 
                 <td class="price"><span class="totals-price"><span class="amount">{{
 

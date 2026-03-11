@@ -605,7 +605,8 @@ tbody, td, tfoot, th, thead, tr {
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">%</span>
 
-                                            <input type="text" class="form-control" value="0" id="discountper" name="DiscountPer" placeholder="Tax" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="{{$invoice_master[0]->DiscountPer}}">
+                                            {{-- <input type="text" class="form-control" value="0" id="discountper" name="DiscountPer" placeholder="Tax" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="{{$invoice_master[0]->DiscountPer}}"> --}}
+                                            <input type="text" class="form-control" value="0" id="discountper" name="DiscountPer" placeholder="Tax" onkeypress="return IsNumeric(event);" ondrop="return false;" onpaste="return false;" value="{{$invoice_master[0]->DiscountPer}}" readonly style="background-color:#e9ecef; cursor:not-allowed;">
 
                                             <span class="input-group-text bg-light">{{session::get('Currency')}}</span>
 
@@ -1134,42 +1135,48 @@ function TaxIncExc()
         subTotal = parseFloat($('#subTotal').val());
 
 
-        discountper = $('#discountper').val();
+        // discountper = $('#discountper').val();
          
-        if (discountper != '' && typeof(discountper) != "undefined") {
+        // if (discountper != '' && typeof(discountper) != "undefined") {
 
-            discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
+        //     discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
 
-            $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
-            total = subTotal - discountamount;
-            $('#Total').val(total.toFixed(2));
-            $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
+        //     $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
+        //     total = subTotal - discountamount;
+        //     $('#Total').val(total.toFixed(2));
+        //     $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
 
 
-        } else {
-            $('#discountper').val(0);
-            // alert('dd');
-            $('#DiscountAmount').val(0);
+        // } else {
+        //     $('#discountper').val(0);
+        //     // alert('dd');
+        //     $('#DiscountAmount').val(0);
             
 
-             total = subTotal - discountamount;
-            $('#Total').val(total.toFixed(2));
-            $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
+        //      total = subTotal - discountamount;
+        //     $('#Total').val(total.toFixed(2));
+        //     $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
              
 
-        }
-    
+        // }
+         // Discount now driven by manual #discountAmount input
+        calculateFromDiscountAmount();
          calculateTotal();
     }
 
 
-    $(document).on('blur', '#discountAmount', function() {
+    // $(document).on('blur', '#discountAmount', function() {
 
 
-        // calculatediscountper();
+    //     // calculatediscountper();
        
 
-    });
+    // });
+
+    $(document).on('keyup blur change', '#discountAmount', function() {
+    // calculatediscountper(); // DISABLED: % recalculation removed
+    calculateFromDiscountAmount(); // user types amount directly → recalculate totals
+});
 
     function calculatediscountper() {
  
@@ -1200,6 +1207,24 @@ function TaxIncExc()
 
         $('#Grandtotal').val(total+parseFloat($('#grandtotaltax').val()));
  
+    }
+
+    // NEW: User manually enters discount amount, Total & Grandtotal update accordingly
+    function calculateFromDiscountAmount() {
+        var subTotal    = parseFloat($('#subTotal').val())      || 0;
+        var discountAmt = parseFloat($('#discountAmount').val()) || 0;
+        var grandTaxVal = parseFloat($('#grandtotaltax').val())  || 0;
+        var shipping    = parseFloat($('#shipping').val())       || 0;
+
+        // Keep % field readonly — do NOT recalculate it
+        // var discountPer = subTotal > 0 ? ((discountAmt / subTotal) * 100).toFixed(2) : 0;
+        // $('#discountper').val(discountPer); // commented: % field is readonly
+
+        var Total      = subTotal - discountAmt;
+        var Grandtotal = Total + grandTaxVal + shipping;
+
+        $('#Total').val(Total.toFixed(2));
+        $('#Grandtotal').val(Grandtotal.toFixed(2));
     }
 
     //////////////////

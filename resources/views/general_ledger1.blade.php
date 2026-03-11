@@ -42,8 +42,19 @@
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                                     <h4 class="mb-sm-0 font-size-18">General Ledger</h4>
-                                        <strong class="text-end"></strong> 
-        From {{request()->StartDate}} TO {{request()->EndDate}}
+                                    
+                                    <div>
+                                        <strong class="me-2">From {{request()->StartDate}} TO {{request()->EndDate}}</strong>
+                                        
+                                        <form action="{{url('GeneralLedger1Excel')}}" method="post" style="display:inline;">
+                                            @csrf
+                                            <input type="hidden" name="StartDate" value="{{request()->StartDate}}">
+                                            <input type="hidden" name="EndDate" value="{{request()->EndDate}}">
+                                            <input type="hidden" name="ChartOfAccountID" value="{{request()->ChartOfAccountID}}">
+                                            <input type="hidden" name="ChartOfAccountID1" value="{{request()->ChartOfAccountID1}}">
+                                            <button type="submit" class="btn btn-success btn-sm"> Export to Excel</button>
+                                        </form>
+                                    </div>
 
                                 </div>
                             </div>

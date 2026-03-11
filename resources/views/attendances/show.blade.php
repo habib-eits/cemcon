@@ -54,7 +54,11 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $row->employee->FirstName }}</td>
                                                     <td>{{ $row->employee->jobTitle->JobTitleName ?? 'N/A' }}</td>
+                                                    @if($row->status != 0)
                                                     <td>{{ $row->job->JobNo ?? 'N/A' }}</td>
+                                                    @else
+                                                    <td>-</td>
+                                                    @endif
                                                     <td class="text-end">{{ $status }}</td>
                                                     <td class="text-end">{{ $row->worked_hours }}</td>
                                                     <td class="text-end">{{ $row->overtime }}</td>
@@ -64,6 +68,14 @@
                                                             data-id="{{ $row->id }}">
                                                             Edit
                                                         </button>
+                                                        
+                                                        <form action="{{ route('attendance-details.destroy', $row->id) }}" method="POST" style="display: inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this record?');">
+                                                                Delete
+                                                            </button>
+                                                        </form> 
                                                         
                                                     </td>
 

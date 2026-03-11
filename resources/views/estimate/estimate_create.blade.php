@@ -60,7 +60,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
 
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> REMOVED to avoid conflict -->
 
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
@@ -1172,6 +1172,19 @@
 
                             var i = $('table tr').length;
 
+    var fullItemData = {!! $item !!}; // Use global variable for item details
+
+    var itemsList = [
+        @foreach ($items as $key => $value)
+        {
+            id: "{{$value->ItemID}}",
+            code: "{{$value->ItemCode}}",
+            name: "{{$value->ItemName}}",
+            percentage: "{{$value->Percentage}}"
+        },
+        @endforeach
+    ];
+
                         </script>
 
 
@@ -1240,8 +1253,7 @@
 
                                             <td valign="top">
 
-
-
+                                                <div class="d-flex align-items-center">
                                                 <select name="ItemID0[]" id="ItemID0_1"
 
                                                     class="item form-select  form-control-sm select2   changesNoo "
@@ -1254,11 +1266,13 @@
 
                                                     <option value="{{$value->ItemID}}">
 
-                                                        {{$value->ItemCode}}-{{$value->ItemName}}</option>
+                                                        {{$value->ItemName}}</option>
 
                                                     @endforeach
 
                                                 </select>
+                                                <button type="button" class="btn btn-sm btn-primary ms-1" onclick="openItemModal(this)" title="Add New Item">+</button>
+                                                </div>
 
                                                 <input type="hidden" name="ItemID[]" id="ItemID_1">
 
@@ -1712,13 +1726,17 @@ The prices in this offer are based on current raw material costs and exchange ra
 
 
 
-                                            <input type="text" class="form-control" value="0" id="discountper"
+                                            {{-- <input type="text" class="form-control" value="0" id="discountper"
 
                                                 name="DiscountPer" placeholder="Tax"
 
                                                 onkeypress="return IsNumeric(event);" ondrop="return false;"
 
-                                                onpaste="return false;">
+                                                onpaste="return false;"> --}}
+                                                <input type="text" class="form-control" value="0" id="discountper"
+                                                name="DiscountPer" placeholder="Tax"
+                                                onkeypress="return IsNumeric(event);" ondrop="return false;"
+                                                onpaste="return false;" readonly style="background-color:#e9ecef; cursor:not-allowed;">
 
 
 
@@ -2045,18 +2063,18 @@ $(".addmore").on('click', function() {
     
 
     html += '<td>';
-
-    html += '<select name="ItemID0[]" id="ItemID0_' + i + '" style="width: 300px !important;" class="form-select select2 changesNoo" onchange="km(this.value,' + i + ');">';
+    html += '<div class="d-flex align-items-center">';
+    html += '<select name="ItemID0[]" id="ItemID0_' + i + '" style="width: 300px !important;" class="item form-select select2 changesNoo" onchange="km(this.value,' + i + ');">';
 
     html += '<option value="">select</option>';
 
-    @foreach ($items as $key => $value)
-
-    html += '<option value="{{$value->ItemID}}|{{$value->Percentage}}">{{$value->ItemCode}}-{{$value->ItemName}}-{{$value->Percentage}}</option>';
-
-    @endforeach
+    itemsList.forEach(function(item) {
+        html += '<option value="' + item.id + '|' + item.percentage + '">' + item.name + '-' + item.percentage + '</option>';
+    });
 
     html += '</select>';
+    html += '<button type="button" class="btn btn-sm btn-primary ms-1" onclick="openItemModal(this)" title="Add New Item">+</button>';
+    html += '</div>';
 
     html += '<input type="hidden" name="ItemID[]" id="ItemID_' + i + '">';
 
@@ -2292,26 +2310,6 @@ $(".addmore").on('click', function() {
 
 
 
-        var data = <?php echo $item; ?>;
-
-        // console.log(data);
-
-
-
-        // console.log( "readaay!" );
-
-
-
-        var data = <?php echo $item; ?> // this is dynamic data in json_encode(); from controller
-
-
-
-        // console.log($('#ItemID_' + id[1]).val());
-
-
-
-
-
         var item_idd = $('#ItemID_' + id[1]).val();
 
         // console.log(item_idd);
@@ -2320,7 +2318,7 @@ $(".addmore").on('click', function() {
 
         var val = parseInt(item_idd);
 
-        var json = data.find(function(item, i) {
+        var json = fullItemData.find(function(item, i) {
 
             if (item.ItemID === val) {
 
@@ -3004,6 +3002,23 @@ function TaxIncExc()
 
     ////////////////////////////////////////////
 
+    // New function: user manually enters discount amount, update Total & Grandtotal
+    function calculateFromDiscountAmount() {
+        var subTotal = parseFloat($('#subTotal').val()) || 0;
+        var discountAmount = parseFloat($('#discountAmount').val()) || 0;
+        var grandtotaltax = parseFloat($('#grandtotaltax').val()) || 0;
+        var shipping = parseFloat($('#shipping').val()) || 0;
+
+        // Update discount % display (readonly, just for info)
+        // var discountPer = subTotal > 0 ? ((discountAmount / subTotal) * 100).toFixed(2) : 0;
+        // $('#discountper').val(discountPer); // commented: keeping % field readonly/static
+
+        var Total = subTotal - discountAmount;
+        var Grandtotal = Total + grandtotaltax + shipping;
+
+        $('#Total').val(Total.toFixed(2));
+        $('#Grandtotal').val(Grandtotal.toFixed(2));
+    }
 
 
     function calculatediscount() {
@@ -3016,57 +3031,58 @@ function TaxIncExc()
 
 
 
-        discountper = $('#discountper').val();
+        // discountper = $('#discountper').val();
 
          
 
-        if (discountper != '' && typeof(discountper) != "undefined") {
+        // if (discountper != '' && typeof(discountper) != "undefined") {
 
 
 
-            discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
+        //     discountamount = parseFloat(subTotal) * (parseFloat(discountper) / 100);
 
 
 
-            $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
+        //     $('#discountAmount').val(parseFloat(discountamount.toFixed(2)));
 
-            total = subTotal - discountamount;
+        //     total = subTotal - discountamount;
 
-            $('#Total').val(total.toFixed(2));
+        //     $('#Total').val(total.toFixed(2));
 
-            $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
-
-
+        //     $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
 
 
 
-        } else {
 
-            $('#discountper').val(0);
 
-            // alert('dd');
+        // } else {
 
-            $('#DiscountAmount').val(0);
+        //     $('#discountper').val(0);
+
+        //     // alert('dd');
+
+        //     $('#DiscountAmount').val(0);
 
             
 
 
 
-             total = subTotal - discountamount;
+        //      total = subTotal - discountamount;
 
-            $('#Total').val(total.toFixed(2));
+        //     $('#Total').val(total.toFixed(2));
 
-            $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
+        //     $('#Grandtotal').val(total.toFixed(2)+parseFloat($('#grandtotaltax').val()));
 
              
 
 
 
-        }
+        // }
 
     
 
-         calculateTotal();
+        //  calculateTotal();
+        calculateFromDiscountAmount();
 
     }
 
@@ -3074,18 +3090,23 @@ function TaxIncExc()
 
 
 
-    $(document).on('blur', '#discountAmount', function() {
+    // $(document).on('blur', '#discountAmount', function() {
 
 
 
 
 
-        // calculatediscountper();
+    //     // calculatediscountper();
 
        
 
 
 
+    // });
+
+    $(document).on('keyup blur change', '#discountAmount', function() {
+    // calculatediscountper(); // disabled % recalculation
+    calculateFromDiscountAmount(); // new function below
     });
 
 
@@ -3904,8 +3925,12 @@ function TaxIncExc()
  
 <script>
     $('#contactForm').on('submit', function(e) {
-        // alert('dd');
         e.preventDefault();
+
+        if (typeof tinymce !== 'undefined') {
+            tinymce.triggerSave();
+        }
+
         const btn = $("#submitBtn");
         let formData = new FormData($("#contactForm")[0]);
         $.ajax({
@@ -3975,5 +4000,129 @@ function TaxIncExc()
     });
 </script>
 
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
+        {{-- <button type="button" class="close" onclick="$('#addItemModal').modal('hide');" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> --}}
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addItemForm">
+            @csrf
+            <div class="form-group mb-3 d-none">
+                <label for="newItemCode">Item Code</label>
+                <input type="text" class="form-control" id="newItemCode" name="ItemCode">
+            </div>
+            <div class="form-group mb-3">
+                <label for="newItemName">Item Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="newItemName" name="ItemName" required>
+            </div>
+            <div class="form-group mb-3 d-none">
+                <label for="newUnit">Unit <span class="text-danger d-none">*</span></label>
+                <select class="form-control" id="newUnit" name="Unit" required>
+                    <option value="">Select Unit</option>
+                    @foreach($unit as $u)
+                        <option value="{{$u->UnitName}}">{{$u->UnitName}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="newUnitQty">Unit Quantity</label>
+                <input type="number" class="form-control" id="newUnitQty" name="UnitQty" step="0.01" value="1">
+            </div>
+            <div class="form-group mb-3">
+                <label for="newCostPrice">Cost Price</label>
+                <input type="number" class="form-control" id="newCostPrice" name="CostPrice" step="0.01">
+            </div>
+            <div class="form-group mb-3">
+                <label for="newSellingPrice">Selling Price</label>
+                <input type="number" class="form-control" id="newSellingPrice" name="SellingPrice" step="0.01">
+            </div>
+
+        </form>
+        <div id="addItemError" class="alert alert-danger d-none mt-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="$('#addItemModal').modal('hide');">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewItem()">Save Item</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentTargetSelect = null;
+
+function openItemModal(btn) {
+    currentTargetSelect = $(btn).siblings('select');
+    $('#addItemForm')[0].reset();
+    $('#addItemError').addClass('d-none').text('');
+    $('#addItemModal').modal('show');
+}
+
+function saveNewItem() {
+    var formData = new FormData($('#addItemForm')[0]);
+    
+    $.ajax({
+        url: 'AjaxItemSave',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if(response.status == 'success') {
+                var newItem = {
+                    id: response.item.ItemID,
+                    // code: response.item.ItemCode,
+                    name: response.item.ItemName,
+                    percentage: response.item.Percentage || 0
+                };
+                itemsList.push(newItem);
+                fullItemData.push(response.item); // Update global data source
+                
+                var optionText = newItem.name + '-' + newItem.percentage;
+                var optionValue = newItem.id + '|' + newItem.percentage;
+                
+                var newOption = new Option(optionText, optionValue, false, false);
+                $('.item').append(newOption);
+                
+                if(currentTargetSelect) {
+                    currentTargetSelect.val(optionValue).trigger('change');
+                    var selectId = currentTargetSelect.attr('id');
+                    if(selectId) {
+                         var idParts = selectId.split('_');
+                         if(idParts.length > 1) {
+                             km(optionValue, idParts[1]);
+                         }
+                    }
+                }
+                
+                $('#addItemModal').modal('hide');
+            } else {
+                var errorMsg = response.message || 'Error saving item';
+                if(response.errors) {
+                    errorMsg = '';
+                    $.each(response.errors, function(key, value) {
+                        errorMsg += value + '<br>';
+                    });
+                }
+                $('#addItemError').removeClass('d-none').html(errorMsg);
+            }
+        },
+        error: function(xhr) {
+             $('#addItemError').removeClass('d-none').text('Server Error: ' + xhr.statusText);
+        }
+    });
+}
+</script>
 
 @endsection

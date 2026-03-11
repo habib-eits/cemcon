@@ -76,6 +76,25 @@
 @endif
                         <div class="row">
                             <div class="col-xl-12">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <form id="filter-form" class="row align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Staff Type</label>
+                                                <select name="StaffType" id="filter_staff_type" class="form-select">
+                                                    <option value="">All Staff Types</option>
+                                                    @foreach($staff_type as $type)
+                                                        <option value="{{ $type->StaffType }}">{{ $type->StaffType }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button type="button" id="btn-apply" class="btn btn-primary w-md">Apply</button>
+                                                <button type="button" id="btn-reset" class="btn btn-secondary w-md">Reset</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                                  <div class="card">
                                      <div class="card-body p-4">
                                          <table id="datatable" class="table table-hover  dt-responsive  nowrap w-100 table-sm">
@@ -131,11 +150,16 @@ $(document).ready(function() {
 
      
 
-     $('#datatable').DataTable({
+    var table = $('#datatable').DataTable({
         "processing": true,
         "serverSide": true,
         "pageLength":50,
-        "ajax": "{{ url('ajax_employee') }}",
+        "ajax": {
+            "url": "{{ url('ajax_employee') }}",
+            "data": function(d) {
+                d.StaffType = $('#filter_staff_type').val();
+            }
+        },
         "columns":[
             { "data": "FullName" },
             { "data": "JobTitleName" },
@@ -149,6 +173,15 @@ $(document).ready(function() {
         ]
      
      });
+
+    $('#btn-apply').click(function() {
+        table.draw();
+    });
+
+    $('#btn-reset').click(function() {
+        $('#filter_staff_type').val('');
+        table.draw();
+    });
 });
 
  

@@ -16,6 +16,12 @@
                             <div class="col-12">
                                 <div class="page-title-box d-print-block d-sm-flex align-items-center justify-content-between">
                                     <h4 class="mb-sm-0 font-size-18">Expense Report</h4>
+                                    
+                                    @if($selected_job)
+                                        <div class="text-end">
+                                            <h5 class="mb-0">Job: <span class="text-primary">{{ $selected_job->JobNo }}</span></h5>
+                                        </div>
+                                    @endif
                                          
  
                                 </div>

@@ -1893,7 +1893,12 @@ class Accounts extends Controller
         $item = DB::table('item')->get();
         $unit = DB::table('unit')->get();
         $item_type = DB::table('item_type')->get();
-        $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+        // $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+        $chartofaccount = DB::table('chartofaccount')
+        ->where('ChartOfAccountID', 110000)
+        ->where('Level', 2)
+        ->get();
+
         return view('item', compact('pagetitle', 'item', 'unit', 'chartofaccount','item_type'));
     }
 
@@ -1958,7 +1963,11 @@ class Accounts extends Controller
 
         $item = DB::table('item')->where('ItemID', $id)->get();
         $unit = DB::table('unit')->get();
-        $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+        // $chartofaccount = DB::table('chartofaccount')->where(DB::raw('right(ChartOfAccountID,4)'), 00000)->where(DB::raw('right(ChartOfAccountID,5)'), '!=', 00000)->get();
+         $chartofaccount = DB::table('chartofaccount')
+        ->where('ChartOfAccountID', 110000)
+        ->where('Level', 2)
+        ->get();
 
         return view('item_edit', compact('pagetitle', 'item', 'unit', 'chartofaccount'));
     }
@@ -9905,6 +9914,11 @@ $pagetitle='Purchase Order';
 
         $company = DB::table('company')->get();
 
+        $selected_job = null;
+        if ($request->JobID) {
+            $selected_job = DB::table('job')->where('JobID', $request->JobID)->first();
+        }
+
         $expense_detail = DB::table('v_expense_detail')
     ->whereBetween('Date', [$request->StartDate, $request->EndDate])
     ->when($request->JobID, function ($query, $JobID) {
@@ -9925,7 +9939,7 @@ $pagetitle='Purchase Order';
     ->get();
 
  
-        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary'));
+        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary', 'selected_job'));
         //return $pdf->download('pdfview.pdf');
         // $pdf->setpaper('A4', 'portiate');
     }

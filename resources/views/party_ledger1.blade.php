@@ -16,8 +16,20 @@
                             <div class="col-12">
                                 <div class="page-title-box d-print-block d-sm-flex align-items-center justify-content-between">
                                     <h4 class="mb-sm-0 font-size-18">Party Ledger</h4>
-                                        <strong class="text-end">{{$party[0]->PartyID}} - {{$party[0]->PartyName}}</strong> 
-        From {{request()->StartDate}} TO {{request()->EndDate}}
+                                    
+                                    <div>
+                                        <strong class="text-end me-2">{{$party[0]->PartyID}} - {{$party[0]->PartyName}} From {{request()->StartDate}} TO {{request()->EndDate}}</strong> 
+                                        
+                                        <form action="{{url('PartyLedger1Excel')}}" method="post" style="display:inline;">
+                                            @csrf
+                                            <input type="hidden" name="StartDate" value="{{request()->input('StartDate')}}">
+                                            <input type="hidden" name="EndDate" value="{{request()->input('EndDate')}}">
+                                            <input type="hidden" name="PartyID" value="{{request()->input('PartyID')}}">
+                                            <input type="hidden" name="VoucherTypeID" value="{{request()->input('VoucherTypeID')}}">
+                                            <input type="hidden" name="ChartOfAccountID" value="{{request()->input('ChartOfAccountID[]')}}">
+                                            <button type="submit" class="btn btn-success btn-sm"> Export to Excel</button>
+                                        </form>
+                                    </div>
 
                                 </div>
                             </div>

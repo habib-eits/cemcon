@@ -16,7 +16,17 @@
                  <h2 class=" float-start mb-0">{{$supplier[0]->SupplierID}}-{{$supplier[0]->SupplierName}}</h2><br>
                </div>
                <div class="col">
-                <h2 class=" float-end mb-0">Party Ledger</h2><br>
+                {{-- <h2 class=" float-end mb-0">Party Ledger</h2><br> --}}
+                <div class="float-end mt-2">
+                     <form action="{{url('SupplierLedger1Excel')}}" method="post" style="display:inline;">
+                        @csrf
+                        <input type="hidden" name="StartDate" value="{{request()->input('StartDate')}}">
+                        <input type="hidden" name="EndDate" value="{{request()->input('EndDate')}}">
+                        <input type="hidden" name="SupplierID" value="{{request()->input('SupplierID')}}">
+                        <input type="hidden" name="ChartOfAccountID" value="{{request()->input('ChartOfAccountID')}}">
+                        <button type="submit" class="btn btn-success btn-sm"> Export to Excel</button>
+                    </form>
+                </div>
                </div>
             </div>
         <div class="row">

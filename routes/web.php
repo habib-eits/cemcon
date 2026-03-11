@@ -51,6 +51,8 @@ use App\Http\Controllers\SalaryDetailController;
 use App\Http\Controllers\EmployeeDetailController;
 use App\Http\Controllers\AttendanceDetailController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\LedgerExportController;
+use App\Http\Controllers\AjaxItemController;
 
 Route::get('/base1/', [KM::class, 'base1']);
 Route::post('/base2/', [KM::class, 'base2']);
@@ -93,6 +95,7 @@ Route::group(['middleware' => ['CheckAdmin']], function () {
     Route::post('/Ajax_Balance', [Accounts::class, 'Ajax_Balance']);
     Route::post('/Ajax_VHNO', [Accounts::class, 'Ajax_VHNO']);
     Route::post('/ajax_invoice_vhno', [Accounts::class, 'ajax_invoice_vhno']);
+    Route::post('/AjaxItemSave', [AjaxItemController::class, 'store']);
 
 
     Route::get('/Voucher', [Accounts::class, 'Voucher']);
@@ -176,6 +179,7 @@ Route::group(['middleware' => ['CheckAdmin']], function () {
     Route::get('/PartyLedger/', [Accounts::class, 'PartyLedger']);
     Route::post('/PartyLedger1/', [Accounts::class, 'PartyLedger1']);
     Route::post('/PartyLedger1PDF/', [Accounts::class, 'PartyLedger1PDF']);
+    Route::post('/PartyLedger1Excel/', [LedgerExportController::class, 'PartyLedger1Excel']);
 
     Route::post('/PartySalesLedger1PDF/', [Accounts::class, 'PartySalesLedger1PDF']);
     Route::post('/PartyLedger2PDF/', [Accounts::class, 'PartyLedger2PDF']);
@@ -230,6 +234,7 @@ Route::group(['middleware' => ['CheckAdmin']], function () {
     Route::get('/SupplierLedger/', [Accounts::class, 'SupplierLedger']);
     Route::post('/SupplierLedger1/', [Accounts::class, 'SupplierLedger1']);
     Route::post('/SupplierLedger1PDF/', [Accounts::class, 'SupplierLedger1PDF']);
+    Route::post('/SupplierLedger1Excel/', [LedgerExportController::class, 'SupplierLedger1Excel']);
     Route::post('/SupplierBillLedger2PDF/', [Accounts::class, 'SupplierBillLedger2PDF']);
 
     Route::get('/SupplierWiseSale/', [Accounts::class, 'SupplierWiseSale']);
@@ -266,6 +271,7 @@ Route::group(['middleware' => ['CheckAdmin']], function () {
     Route::get('/GeneralLedger/', [Accounts::class, 'GeneralLedger']);
     Route::post('/GeneralLedger1/', [Accounts::class, 'GeneralLedger1']);
     Route::post('/GeneralLedger1PDF/', [Accounts::class, 'GeneralLedger1PDF']);
+    Route::post('/GeneralLedger1Excel/', [LedgerExportController::class, 'GeneralLedger1Excel']);
 
     Route::get('/TrialBalance/', [Accounts::class, 'TrialBalance']);
     Route::post('/TrialBalance1/', [Accounts::class, 'TrialBalance1']);

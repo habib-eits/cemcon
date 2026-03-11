@@ -93,6 +93,11 @@ class AttendanceDetailController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $attendanceDetail = AttendanceDetail::find($id);
+        if ($attendanceDetail) {
+            $attendanceDetail->delete();
+            return redirect()->back()->with('success', 'Record deleted successfully!');
+        }
+        return redirect()->back()->with('error', 'Record not found!');
     }
 }
