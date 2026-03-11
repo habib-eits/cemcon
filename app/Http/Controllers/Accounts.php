@@ -9914,6 +9914,11 @@ $pagetitle='Purchase Order';
 
         $company = DB::table('company')->get();
 
+        $selected_job = null;
+        if ($request->JobID) {
+            $selected_job = DB::table('job')->where('JobID', $request->JobID)->first();
+        }
+
         $expense_detail = DB::table('v_expense_detail')
     ->whereBetween('Date', [$request->StartDate, $request->EndDate])
     ->when($request->JobID, function ($query, $JobID) {
@@ -9934,7 +9939,7 @@ $pagetitle='Purchase Order';
     ->get();
 
  
-        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary'));
+        return View('expense.expense_report1', compact('expense_detail', 'pagetitle', 'company','summary', 'selected_job'));
         //return $pdf->download('pdfview.pdf');
         // $pdf->setpaper('A4', 'portiate');
     }

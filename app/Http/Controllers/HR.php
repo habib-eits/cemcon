@@ -278,10 +278,9 @@ $pagetitle='Dashboard';
              return redirect()->back()->with('error', 'You access is limited')->with('class','danger');
            }
 
+        $staff_type = DB::table('staff_type')->get();
 
-
-
-        return view ('hr.employee'); 
+        return view ('hr.employee', compact('staff_type')); 
     }
 
 
@@ -289,7 +288,14 @@ $pagetitle='Dashboard';
  public function ajax_employee(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('v_employee')->orderby('EmployeeID','asc')->get();
+            $data = DB::table('v_employee');
+            
+            if ($request->StaffType) {
+                $data = $data->where('StaffType', $request->StaffType);
+            }
+            
+            $data = $data->orderby('EmployeeID','asc')->get();
+
             return Datatables::of($data)
                     ->addIndexColumn()
                     ->addColumn('action', function($row){
