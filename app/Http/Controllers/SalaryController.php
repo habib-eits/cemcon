@@ -107,6 +107,25 @@ class SalaryController extends Controller
     }
 
 
+    public function slip($detailId)
+    {
+        // Load the individual salary detail with all needed relationships
+        $detail = \App\Models\SalaryDetail::with([
+            'employee',       // employee info (name, etc.)
+            'jobTitle',       // designation
+            'salaryType',     // salary type label
+            'salary',         // parent salary record (to get month, branch, etc.)
+            'salary.branch',  // branch info
+        ])->findOrFail($detailId);
+    
+        // Load the company record — adjust the model/query to match your setup
+        // e.g. if you have a Company model:
+        $company = DB::table('company')->first();
+        // Or if company is stored in a settings table, fetch it accordingly.
+    
+        // Return the salary slip Blade view (your existing slip template)
+        return view('salaries.slip', compact('detail', 'company'));
+    }
 
     
 

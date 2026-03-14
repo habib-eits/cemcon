@@ -9934,7 +9934,7 @@ $pagetitle='Purchase Order';
     ->when($request->JobID, function ($query, $JobID) {
         return $query->where('JobID', $JobID);
     })
-    ->orderBy('Date')
+    // ->orderBy('Date')
     ->groupby('ChartOfAccountName')
     ->get();
 

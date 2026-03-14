@@ -11,48 +11,40 @@
 |
 */
 
-use App\Http\Controllers\HR;
-
-
-
-use App\Http\Controllers\KM;
-use App\Http\Controllers\User;
 use App\Http\Controllers\Accounts;
-use App\Http\Controllers\Employee;
-use App\Http\Controllers\Documents;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\JobController;
-use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AjaxController;
-use App\Http\Controllers\ChartOfAccount;
-//HR
-use App\Http\Controllers\LeadController;
-use App\Http\Controllers\StaffController;
-
-use App\Http\Controllers\BranchController;
-
-
-// CRM CONTROLLERS
-use App\Http\Controllers\ReportController;
-
-use App\Http\Controllers\SalaryController;
-use App\Http\Controllers\StatusController;
-use App\Http\Controllers\BookingController;
- use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\EstimateController;
-use App\Http\Controllers\JobProfitLossReport;
-use App\Http\Controllers\SaleOrderController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\SubServiceController;
-use App\Http\Controllers\SalaryDetailController;
-use App\Http\Controllers\EmployeeDetailController;
-use App\Http\Controllers\AttendanceDetailController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\LedgerExportController;
 use App\Http\Controllers\AjaxItemController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceDetailController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\ChartOfAccount;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Documents;
+use App\Http\Controllers\Employee;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeDetailController;
+use App\Http\Controllers\EstimateController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\HR;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\JobProfitLossReport;
+use App\Http\Controllers\KM;
+use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LedgerExportController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\SalaryDetailController;
+use App\Http\Controllers\SaleOrderController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StatusController;
+use App\Http\Controllers\SubServiceController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\User;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/base1/', [KM::class, 'base1']);
 Route::post('/base2/', [KM::class, 'base2']);
@@ -872,13 +864,14 @@ Route::get('/AttendanceView/{date}',[HR::class,'AttendanceView']);
     Route::resource('attendance-details', AttendanceDetailController::class);
 
     Route::resource('salaries', SalaryController::class);
+    Route::get('/salaries/slip/{detailId}', [SalaryController::class, 'slip'])->name('salaries.slip');
     Route::resource('salary-details', SalaryDetailController::class);
 
 
 });
 
 
-
+Route::get('test', [TestController::class, 'index']);
 
 
 
