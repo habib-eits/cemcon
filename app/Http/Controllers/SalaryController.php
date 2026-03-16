@@ -216,7 +216,7 @@ class SalaryController extends Controller
                 ]
             );
         }
-        
+        return redirect()->route('salaries.index');
         
     }
 

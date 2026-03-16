@@ -55,7 +55,7 @@
  
     .header-bottom { display: flex; align-items: center; padding: 6px 12px; }
     .cemcon-brand  { font-size: 13px; font-weight: 700; color: #111; flex: 1; }
-    .monthly-title { font-size: 14px; font-weight: 700; color: #111; flex: 2; text-align: center; }
+    .monthly-title { font-size: 14px; font-weight: 700; color: #111; flex: 1; text-align: center; }
  
     /* ── EMPLOYEE INFO ── */
     .info-table { width: 100%; border-collapse: collapse; margin-top: 14px; border: 2px solid #333; }
@@ -114,7 +114,7 @@
     </div>
  
     <div class="header-bottom">
-      <span class="cemcon-brand">{{ $company->Name ?? '' }}</span>
+      <span style="flex:1"></span>
       <span class="monthly-title">Monthly Salary Slip</span>
       <span style="flex:1"></span>
     </div>
